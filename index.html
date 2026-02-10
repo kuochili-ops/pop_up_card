@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book：小卡同步翻動修正</title>
+    <title>Pop-up Book：小卡 0度重疊同步版</title>
     <style>
         :root {
             --card-w: 350px;
@@ -14,7 +14,7 @@
             --color-inner: #fdfcf0;
             --color-deep-blue: #3498db;
             --color-light-blue: #85c1e9;
-            --anchor-dist: 70px; /* 紅色軸心位置 */
+            --anchor-dist: 70px; 
         }
 
         body {
@@ -78,7 +78,7 @@
         .face.front { background: #e74c3c; transform: rotateX(180deg); }
         .face.back { background: var(--color-inner); transform-style: preserve-3d; }
 
-        /* --- 修正：同步動作邏輯 --- */
+        /* --- 修正：0度重疊結構 --- */
 
         .sub-deep-blue {
             position: absolute;
@@ -87,8 +87,7 @@
             width: var(--sub-w);
             height: var(--sub-h);
             background: var(--color-deep-blue);
-            /* 紅色軸心：在底部 */
-            transform-origin: bottom; 
+            transform-origin: bottom; /* 紅色軸心 */
             transform: translateX(-50%) rotateX(0deg);
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
@@ -97,30 +96,30 @@
 
         .sub-light-blue {
             position: absolute;
-            /* 紫色摺痕：在與深藍頁的交界處 */
-            bottom: 100%; 
+            top: 0; /* 紫色摺痕：在深藍頁的頂部 */
             left: 0;
             width: 100%;
             height: var(--sub-h);
             background: var(--color-light-blue);
-            transform-origin: bottom; 
-            /* 初始狀態：完全覆蓋在深藍頁之上（0度） */
+            transform-origin: top; /* 摺痕在頂部 */
+            /* 初始狀態：夾角 0度 (完全覆蓋在深藍頁上) */
             transform: rotateX(0deg); 
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             border: 1px solid #5499c7;
+            backface-visibility: visible;
         }
 
-        /* --- 同步翻動的核心角度 --- */
+        /* --- 修正：同步翻動邏輯 --- */
 
-        /* 1. 深藍頁：隨大卡同步立起 (0 -> -90度) */
+        /* 1. 深藍頁隨大卡立起 (0 -> -90度) */
         .card-top.is-open ~ .sub-deep-blue {
             transform: translateX(-50%) rotateX(-90deg);
         }
 
-        /* 2. 淺藍頁：隨深藍頁同步「反向」展開 (-90度) */
-        /* 這樣淺藍頁相對於底座會維持 0度（平行），形成階梯 */
+        /* 2. 淺藍頁同步展開 (0 -> 90度) */
+        /* 夾角從 0度 變為 90度，淺藍頁會從小卡底面反向翻開 */
         .card-top.is-open ~ .sub-deep-blue .sub-light-blue {
-            transform: rotateX(-90deg);
+            transform: rotateX(90deg);
         }
 
     </style>
