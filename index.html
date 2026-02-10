@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book：小卡同步啟動修正版</title>
+    <title>Pop-up Book：小卡向內翻轉修正版</title>
     <style>
         :root {
             --card-w: 350px;
@@ -43,7 +43,6 @@
             cursor: pointer;
         }
 
-        /* 大卡底頁 */
         .card-bottom {
             position: absolute;
             top: 0;
@@ -54,7 +53,6 @@
             transform-style: preserve-3d;
         }
 
-        /* 大卡上頁 (蓋子) */
         .card-top {
             position: absolute;
             bottom: 0;
@@ -68,7 +66,6 @@
             z-index: 10;
         }
 
-        /* 動作狀態：掀開 90 度 */
         .card-top.is-open { transform: rotateX(-90deg); }
 
         .face {
@@ -81,7 +78,7 @@
         .face.front { background: #e74c3c; transform: rotateX(180deg); }
         .face.back { background: var(--color-inner); transform-style: preserve-3d; }
 
-        /* --- 小卡同步翻動結構 --- */
+        /* --- 核心修正：翻轉向另一面 --- */
 
         .sub-deep-blue {
             position: absolute;
@@ -91,7 +88,7 @@
             height: var(--sub-h);
             background: var(--color-deep-blue);
             transform-origin: bottom; /* 紅色軸心 */
-            transform: translateX(-50%) rotateX(0deg); /* 初始 0 度貼地 */
+            transform: translateX(-50%) rotateX(0deg);
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
             border: 1px solid #2980b9;
@@ -104,23 +101,24 @@
             width: 100%;
             height: var(--sub-h);
             background: var(--color-light-blue);
-            transform-origin: top; /* 以紫色摺痕為轉軸 */
-            /* 初始夾角 0 度：完全蓋在深藍頁上 */
+            transform-origin: top; /* 摺痕在頂部 */
+            /* 初始狀態：夾角 0 度，蓋在深藍頁上 */
             transform: rotateX(0deg); 
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             border: 1px solid #5499c7;
         }
 
-        /* --- 關鍵連動：隨 .card-top.is-open 同步起動 --- */
+        /* --- 同步動作連動 --- */
 
-        /* 當大卡狀態改變時，深藍頁同步立起 */
+        /* 1. 深藍頁立起 (0 -> -90度) */
         .card-top.is-open ~ .sub-deep-blue {
             transform: translateX(-50%) rotateX(-90deg);
         }
 
-        /* 當大卡狀態改變時，淺藍頁從小卡底面反向翻開 */
+        /* 2. 淺藍頁翻向另一面 (0 -> -90度) */
+        /* 向內摺疊，使其末端剛好指向大卡的另一面/掀蓋面 */
         .card-top.is-open ~ .sub-deep-blue .sub-light-blue {
-            transform: rotateX(90deg);
+            transform: rotateX(-90deg);
         }
 
     </style>
@@ -129,7 +127,6 @@
 
     <div class="scene">
         <div class="card-system" onclick="this.querySelector('.card-top').classList.toggle('is-open')">
-            
             <div class="card-bottom"></div>
             
             <div class="card-top">
@@ -140,7 +137,6 @@
             <div class="sub-deep-blue">
                 <div class="sub-light-blue"></div>
             </div>
-
         </div>
     </div>
 
