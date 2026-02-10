@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book：附著點微調版</title>
+    <title>Pop-up Book: 物理程序校準</title>
     <style>
         :root {
             --card-w: 350px;
@@ -14,10 +14,6 @@
             --color-inner: #fdfcf0;
             --color-sub-top: #5dade2;
             --color-sub-bottom: #3498db;
-            
-            /* 修正：將下邊附著處往大卡摺痕(中線)移動 */
-            /* 數值越小，小卡離中線越近。原本是 40px，現在改為 20px */
-            --anchor-offset: 20px; 
         }
 
         body {
@@ -42,11 +38,11 @@
             height: 100%;
             position: relative;
             transform-style: preserve-3d;
-            top: 50%;
+            top: 50%; /* 大卡中摺線位置 */
             cursor: pointer;
         }
 
-        /* 大卡底頁 */
+        /* 大卡底頁 (下內頁) */
         .card-bottom {
             position: absolute;
             top: 0;
@@ -65,14 +61,14 @@
             width: 100%;
             height: var(--card-h);
             transform-origin: bottom;
-            transform: rotateX(-180deg);
+            transform: rotateX(-180deg); /* 初始閉合狀態 */
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
             z-index: 10;
         }
 
         .card-top.is-open {
-            transform: rotateX(-90deg);
+            transform: rotateX(-90deg); /* 完全開啟至 90 度 */
         }
 
         .face.back { 
@@ -84,16 +80,17 @@
             backface-visibility: hidden;
         }
 
-        /* --- 小卡結構 --- */
+        /* --- 小卡連動核心 --- */
+
         .sub-card-container {
             position: absolute;
             left: 50%;
-            top: var(--anchor-offset); 
+            /* 紫色邊固定位置：距離中線一個小卡高度 */
+            top: var(--sub-h); 
             width: var(--sub-w);
             height: var(--sub-h);
             transform: translateX(-50%);
             transform-style: preserve-3d;
-            pointer-events: none;
         }
 
         .sub-bottom {
@@ -101,8 +98,8 @@
             width: 100%;
             height: 100%;
             background: var(--color-sub-bottom);
-            transform-origin: bottom; 
-            transform: rotateX(0deg); 
+            transform-origin: bottom; /* 下紫色邊軸心 */
+            transform: rotateX(0deg);
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
             border: 1px solid #2980b9;
@@ -110,26 +107,26 @@
 
         .sub-top {
             position: absolute;
-            bottom: 100%; 
+            bottom: 100%; /* 紅線接合點 */
             width: 100%;
             height: var(--sub-h);
             background: var(--color-sub-top);
-            transform-origin: bottom;
-            transform: rotateX(0deg); 
+            transform-origin: bottom; /* 紅線軸心 */
+            transform: rotateX(0deg);
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             border: 1px solid #2980b9;
         }
 
-        /* --- 開合連動邏輯 --- */
-        
+        /* --- 連動邏輯：同步開啟程序 --- */
+
+        /* 1. 當大卡開啟，下半面旋轉立起 */
         .card-top.is-open ~ .sub-card-container .sub-bottom {
-            /* 為了補償縮短的位移，角度調整為讓小卡能接觸到開啟後的蓋子 */
-            transform: rotateX(125deg); 
+            transform: rotateX(90deg); /* 垂直於大卡底頁 */
         }
 
+        /* 2. 上半面相對摺疊，使其頂端剛好貼合上頁 */
         .card-top.is-open ~ .sub-card-container .sub-bottom .sub-top {
-            /* 對應的角度補償 */
-            transform: rotateX(-125deg); 
+            transform: rotateX(-90deg); /* 水平狀態 */
         }
 
     </style>
@@ -138,15 +135,19 @@
 
     <div class="scene">
         <div class="card-system" onclick="this.querySelector('.card-top').classList.toggle('is-open')">
+            
             <div class="card-bottom"></div>
+
             <div class="card-top">
                 <div class="face back"></div>
             </div>
+
             <div class="sub-card-container">
                 <div class="sub-bottom">
                     <div class="sub-top"></div>
                 </div>
             </div>
+
         </div>
     </div>
 
