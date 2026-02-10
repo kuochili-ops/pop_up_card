@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book：上半面反向旋轉修正</title>
+    <title>Pop-up Book：最終物理校準</title>
     <style>
         :root {
             --card-w: 350px;
@@ -14,6 +14,8 @@
             --color-inner: #fdfcf0;
             --color-sub: #3498db;
             --color-sub-alt: #5dade2;
+            /* 小卡固定點距離中心摺線的距離 */
+            --anchor-offset: 80px; 
         }
 
         body {
@@ -30,7 +32,8 @@
             width: var(--card-w);
             height: var(--card-h);
             transform-style: preserve-3d;
-            transform: rotateX(25deg) rotateY(-15deg);
+            /* 調整視角使翻開後正對鏡頭 */
+            transform: rotateX(45deg) rotateY(-15deg);
         }
 
         .card-system {
@@ -39,6 +42,7 @@
             position: relative;
             transform-style: preserve-3d;
             top: 50%;
+            cursor: pointer;
         }
 
         /* 大卡底頁 */
@@ -60,13 +64,15 @@
             width: 100%;
             height: var(--card-h);
             transform-origin: bottom;
-            transform: rotateX(-180deg);
+            /* 初始：蓋在大卡下頁上 */
+            transform: rotateX(0deg); 
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
             z-index: 10;
         }
 
         .card-top.is-open {
+            /* 翻開 90 度垂直立起 */
             transform: rotateX(-90deg);
         }
 
@@ -77,14 +83,17 @@
             backface-visibility: hidden;
             border: 1px solid #ccc;
         }
+        /* 外頁面 */
         .face.front { background: #e74c3c; transform: rotateX(180deg); }
+        /* 內頁面 */
         .face.back { background: var(--color-inner); transform-style: preserve-3d; }
 
-        /* --- 保留：小卡下半面向螢幕立起 --- */
+        /* --- 小卡下半面：固定在底座 --- */
         .sub-bottom {
             position: absolute;
             left: 50%;
-            top: var(--sub-h); 
+            /* 距離中線 --anchor-offset 的位置 */
+            top: var(--anchor-offset); 
             width: var(--sub-w);
             height: var(--sub-h);
             background: var(--color-sub);
@@ -95,30 +104,31 @@
         }
 
         .card-top.is-open ~ .sub-bottom {
-            /* 維持原有向觀眾立起的負角度 */
+            /* 向上方/鏡頭方向立起 90 度 */
             transform: translateX(-50%) rotateX(-90deg);
         }
 
-        /* --- 修正：小卡上半面往另一邊轉動 --- */
+        /* --- 小卡上半面：固定在翻開的蓋子上 --- */
         .sub-top {
             position: absolute;
             left: 50%;
-            bottom: var(--sub-h);
+            /* 固定在上內頁，距離底部摺痕 --anchor-offset 的位置 */
+            bottom: var(--anchor-offset);
             width: var(--sub-w);
             height: var(--sub-h);
             background: var(--color-sub-alt);
             
-            /* 軸心設在底部(與蓋子連接處) */
+            /* 軸心設在底部，與大卡內頁接觸的那條線 */
             transform-origin: bottom; 
             
-            /* 初始狀態 */
+            /* 初始：平貼在大卡內頁上 */
             transform: translateX(-50%) rotateX(0deg); 
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             border: 1px solid #2980b9;
         }
 
         .card-top.is-open .sub-top {
-            /* 修改處：將原本的正角度改為負角度，使其往大卡內頁另一邊轉動 */
+            /* 當大卡立起 90 度時，此處旋轉 -90 度會剛好與底座平行，兩片小卡在中點會接合 */
             transform: translateX(-50%) rotateX(-90deg);
         }
 
