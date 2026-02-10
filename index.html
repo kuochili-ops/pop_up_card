@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book: Final Structure</title>
+    <title>Pop-up Book：透視觀察模式</title>
     <style>
         :root {
             --card-w: 350px;
             --card-h: 220px;
             --sub-w: 120px;
             --sub-h: 80px; 
-            --duration: 1.5s;
-            --color-inner: #fdfcf0;
+            --duration: 2.0s; /* 放慢速度以便觀察細節 */
+            --color-glass: rgba(255, 255, 255, 0.15); /* 透明玻璃質感 */
             --color-sub-top: #5dade2;
             --color-sub-bottom: #3498db;
         }
@@ -21,7 +21,7 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #2c3e50;
+            background-color: #1a1a1a;
             margin: 0;
             perspective: 2500px;
         }
@@ -42,18 +42,19 @@
             cursor: pointer;
         }
 
-        /* 大卡底頁 (下半面) */
+        /* 大卡底頁：透明化並加入虛線邊框 */
         .card-bottom {
             position: absolute;
             top: 0;
             width: 100%;
             height: var(--card-h);
-            background: var(--color-inner);
-            border: 1px solid #ccc;
+            background: var(--color-glass);
+            border: 2px dashed rgba(255,255,255,0.4);
             transform-style: preserve-3d;
+            transform: translateZ(-2px); /* 稍微後移，確保不遮擋小卡 */
         }
 
-        /* 大卡蓋子 (上半面) */
+        /* 大卡蓋子：透明化 */
         .card-top {
             position: absolute;
             bottom: 0;
@@ -72,59 +73,63 @@
         }
 
         .face.back { 
-            background: var(--color-inner); 
+            background: var(--color-glass); 
             position: absolute; 
             width: 100%; 
             height: 100%; 
+            border: 2px dashed rgba(255,255,255,0.4);
             transform-style: preserve-3d;
         }
 
-        /* 小卡容器：固定於下頁紫色標記處 */
+        /* --- 小卡：保持實色以便觀察軌跡 --- */
         .sub-card-container {
             position: absolute;
             left: 50%;
+            /* 紫色固定邊位置 */
             top: var(--sub-h); 
             width: var(--sub-w);
             height: var(--sub-h);
-            transform: translateX(-50%) translateZ(1px); 
+            transform: translateX(-50%) translateZ(2px);
             transform-style: preserve-3d;
-            z-index: 10;
+            z-index: 100;
         }
 
-        /* 小卡下半部：軸心在紫色底邊 */
         .sub-bottom {
             position: absolute;
             width: 100%;
             height: 100%;
             background: var(--color-sub-bottom);
-            transform-origin: bottom;
+            transform-origin: bottom; 
             transform: rotateX(0deg);
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
-            border: 1px solid #2980b9;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+            border: 1px solid #ffffff44;
         }
 
-        /* 小卡上半部：軸心在紅線 (中摺痕) */
         .sub-top {
             position: absolute;
-            bottom: 100%; 
+            bottom: 100%; /* 紅線摺痕 */
             width: 100%;
             height: var(--sub-h);
             background: var(--color-sub-top);
             transform-origin: bottom;
             transform: rotateX(0deg);
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid #2980b9;
+            transform-style: preserve-3d;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+            border: 1px solid #ffffff44;
         }
 
-        /* 連動動畫 */
+        /* --- 物理連動邏輯 --- */
         .card-top.is-open ~ .sub-card-container .sub-bottom {
-            transform: rotateX(90deg); /* 垂直於底面 */
+            transform: rotateX(90deg); /* 向上立起 */
         }
 
         .card-top.is-open ~ .sub-card-container .sub-bottom .sub-top {
-            transform: rotateX(-90deg); /* 垂直於蓋子 */
+            transform: rotateX(-90deg); /* 向後摺疊 */
         }
+
     </style>
 </head>
 <body>
