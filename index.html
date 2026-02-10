@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>合攏式立體卡片 90度開啟</title>
+    <title>Pop-up Book 物理連動修正</title>
     <style>
         :root {
             --card-w: 350px;
             --card-h: 220px;
-            --pop-size: 100px;
+            --sub-w: 120px;
+            --sub-h: 80px; /* 小卡單面高度 */
             --duration: 1.2s;
-            --color-cover: #c0392b; /* 封面紅 */
-            --color-inner: #fff5e6; /* 內頁米白 */
-            --color-box: #f39c12;   /* 機關橘 */
+            --color-inner: #fdfcf0;
+            --color-sub: #3498db;
         }
 
         body {
@@ -20,154 +20,128 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #dcdde1;
+            background-color: #2c3e50;
             margin: 0;
             perspective: 2000px;
         }
 
-        /* 旋轉整個場景以便觀察 */
         .scene {
             width: var(--card-w);
             height: var(--card-h);
             transform-style: preserve-3d;
-            transform: rotateX(20deg) rotateY(-20deg);
+            transform: rotateX(25deg) rotateY(-15deg);
         }
 
-        /* 卡片本體 */
-        .card {
+        .card-system {
             width: 100%;
             height: 100%;
             position: relative;
             transform-style: preserve-3d;
+            top: 50%;
         }
 
-        /* 下半部 (固定在地板上的底頁) */
+        /* 大卡底頁：固定端在遠處 */
         .card-bottom {
             position: absolute;
+            top: 0;
             width: 100%;
-            height: 100%;
+            height: var(--card-h);
             background: var(--color-inner);
-            border: 1px solid #aaa;
-            border-radius: 0 0 10px 10px;
-            transform-origin: top;
+            border: 1px solid #999;
+            transform-style: preserve-3d;
         }
 
-        /* 上半部 (封面/蓋子) */
+        /* 大卡上頁：開口朝觀眾向上掀 */
         .card-top {
             position: absolute;
+            bottom: 100%;
             width: 100%;
-            height: 100%;
-            background: var(--color-cover);
-            border-radius: 10px 10px 0 0;
-            transform-origin: bottom; /* 以摺痕為軸 */
-            
-            /* 初始狀態：合攏 (蓋在底頁上) */
-            transform: rotateX(0deg); 
-            transition: transform var(--duration) ease-in-out;
+            height: var(--card-h);
+            transform-origin: bottom;
+            transform: rotateX(-180deg);
+            transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
             z-index: 10;
             cursor: pointer;
         }
 
-        /* 打開 90 度狀態 */
         .card-top.is-open {
             transform: rotateX(-90deg);
         }
 
-        /* --- 內部四邊形機關 --- */
-        .pop-up-box {
+        .face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border: 1px solid #999;
+        }
+        .face.front { background: #e74c3c; transform: rotateX(180deg); }
+        .face.back { background: var(--color-inner); }
+
+        /* --- 小卡：物理連動機關 --- */
+
+        /* 小卡下半部：固定在大卡底頁面上，距離中線 var(--sub-h) */
+        .sub-bottom {
             position: absolute;
             left: 50%;
-            bottom: 0;
-            transform: translateX(-50%);
-            width: var(--pop-size);
-            height: var(--pop-size);
-            transform-style: preserve-3d;
-            pointer-events: none;
-        }
-
-        /* 機關前面板 */
-        .pop-front {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--color-box);
-            transform-origin: bottom;
+            top: var(--sub-h);
+            width: var(--sub-w);
+            height: var(--sub-h);
+            background: var(--color-sub);
+            transform-origin: top; /* 旋轉點在與上半部的接合處 (活動摺邊) */
             
-            /* 初始：躺平在大卡底部 */
-            transform: rotateX(-90deg);
-            transition: transform var(--duration) ease-in-out;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-weight: bold;
-            color: white;
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.2);
+            /* 初始：貼平在大卡底面上 (180度翻轉平躺) */
+            transform: translateX(-50%) rotateX(-180deg);
+            transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid #2980b9;
         }
 
-        /* 機關頂面板 */
-        .pop-top {
+        /* 小卡上半部：固定在大卡上頁面上，距離中線 var(--sub-h) */
+        .sub-top {
             position: absolute;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background: #e67e22;
-            transform-origin: top;
+            left: 50%;
+            bottom: var(--sub-h);
+            width: var(--sub-w);
+            height: var(--sub-h);
+            background: #5dade2;
+            transform-origin: bottom; /* 旋轉點在與下半部的接合處 (活動摺邊) */
             
-            /* 初始：與前面板重疊 */
-            transform: rotateX(90deg);
-            transition: transform var(--duration) ease-in-out;
+            /* 初始：貼平在大卡上頁面上 (0度平躺) */
+            transform: translateX(-50%) rotateX(0deg);
+            transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid #2980b9;
         }
 
-        /* 開啟時的連動邏輯 */
-        /* 1. 前面板立起 (與底面成 90度) */
-        .card-top.is-open .pop-front {
-            transform: rotateX(0deg); 
+        /* 當大卡打開時的連動旋轉 */
+        .card-top.is-open ~ .sub-bottom {
+            /* 與底面呈 90 度立起，形成正方形的一邊 */
+            transform: translateX(-50%) rotateX(-90deg);
         }
 
-        /* 2. 頂面板翻平 (與前面板成 90度，與封面平行) */
-        .card-top.is-open .pop-top {
-            transform: rotateX(-90deg);
+        .card-top.is-open .sub-top {
+            /* 與上頁面呈 90 度立起，形成正方形的另一邊 */
+            transform: translateX(-50%) rotateX(90deg);
         }
 
-        /* 提示 */
-        .ui {
-            position: fixed;
-            bottom: 30px;
-            font-family: sans-serif;
-            background: white;
-            padding: 10px 20px;
-            border-radius: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
     </style>
 </head>
 <body>
 
     <div class="scene">
-        <div class="card">
+        <div class="card-system">
             <div class="card-bottom"></div>
 
-            <div class="card-top" id="cardTop">
-                <div style="position:absolute; width:100%; height:100%; backface-visibility:hidden; display:flex; justify-content:center; align-items:center; color:white; font-size:20px;">
-                    立體卡片 (點擊掀開)
-                </div>
-                
-                <div style="position:absolute; width:100%; height:100%; background:var(--color-inner); transform:rotateX(180deg); backface-visibility:hidden; border:1px solid #aaa;">
-                </div>
+            <div class="sub-bottom"></div>
 
-                <div class="pop-up-box">
-                    <div class="pop-front">
-                        OPEN!
-                        <div class="pop-top"></div>
-                    </div>
+            <div class="card-top" id="cardTop">
+                <div class="face front"></div>
+                <div class="face back">
+                    <div class="sub-top"></div>
                 </div>
             </div>
         </div>
     </div>
-
-    <div class="ui">點擊卡片觀察「合攏到 90度」的連動</div>
 
     <script>
         const cardTop = document.getElementById('cardTop');
