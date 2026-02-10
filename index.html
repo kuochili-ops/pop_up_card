@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book 物理連動修正</title>
+    <title>Pop-up Book：外倒式平行連動</title>
     <style>
         :root {
             --card-w: 350px;
@@ -40,7 +40,7 @@
             top: 50%;
         }
 
-        /* 大卡底頁：固定端在遠處 */
+        /* 大卡底頁：摺痕在遠端 */
         .card-bottom {
             position: absolute;
             top: 0;
@@ -51,14 +51,14 @@
             transform-style: preserve-3d;
         }
 
-        /* 大卡上頁：開口朝觀眾向上掀 */
+        /* 大卡上頁：開口向觀眾掀開 */
         .card-top {
             position: absolute;
             bottom: 100%;
             width: 100%;
             height: var(--card-h);
             transform-origin: bottom;
-            transform: rotateX(-180deg);
+            transform: rotateX(-180deg); /* 初始合攏 */
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
             z-index: 10;
@@ -79,9 +79,9 @@
         .face.front { background: #e74c3c; transform: rotateX(180deg); }
         .face.back { background: var(--color-inner); }
 
-        /* --- 小卡：物理連動機關 --- */
+        /* --- 小卡機關：外倒式連動 --- */
 
-        /* 小卡下半部：固定在大卡底頁面上，距離中線 var(--sub-h) */
+        /* 小卡下半部：底邊附著在底頁，距離摺痕 var(--sub-h) */
         .sub-bottom {
             position: absolute;
             left: 50%;
@@ -89,15 +89,14 @@
             width: var(--sub-w);
             height: var(--sub-h);
             background: var(--color-sub);
-            transform-origin: top; /* 旋轉點在與上半部的接合處 (活動摺邊) */
-            
-            /* 初始：貼平在大卡底面上 (180度翻轉平躺) */
-            transform: translateX(-50%) rotateX(-180deg);
+            transform-origin: bottom; /* 附著邊 */
+            /* 合起來時：rotateX(0deg) 是平貼在底頁向開口處倒 */
+            transform: translateX(-50%) rotateX(0deg); 
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             border: 1px solid #2980b9;
         }
 
-        /* 小卡上半部：固定在大卡上頁面上，距離中線 var(--sub-h) */
+        /* 小卡上半部：上邊附著在上頁，距離摺痕 var(--sub-h) */
         .sub-top {
             position: absolute;
             left: 50%;
@@ -105,22 +104,19 @@
             width: var(--sub-w);
             height: var(--sub-h);
             background: #5dade2;
-            transform-origin: bottom; /* 旋轉點在與下半部的接合處 (活動摺邊) */
-            
-            /* 初始：貼平在大卡上頁面上 (0度平躺) */
-            transform: translateX(-50%) rotateX(0deg);
+            transform-origin: top; /* 附著邊 */
+            /* 合起來時：rotateX(0deg) 是平貼在上頁向開口處倒 */
+            transform: translateX(-50%) rotateX(0deg); 
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             border: 1px solid #2980b9;
         }
 
-        /* 當大卡打開時的連動旋轉 */
+        /* 連動動作：打開大卡 90 度時，小卡兩片各自立起 90 度與頁面垂直 */
         .card-top.is-open ~ .sub-bottom {
-            /* 與底面呈 90 度立起，形成正方形的一邊 */
             transform: translateX(-50%) rotateX(-90deg);
         }
 
         .card-top.is-open .sub-top {
-            /* 與上頁面呈 90 度立起，形成正方形的另一邊 */
             transform: translateX(-50%) rotateX(90deg);
         }
 
