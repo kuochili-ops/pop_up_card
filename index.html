@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book：旋轉方向修正</title>
+    <title>Pop-up Book：內摺彈出修正</title>
     <style>
         :root {
             --card-w: 350px;
             --card-h: 220px;
             --sub-w: 120px;
             --sub-h: 80px; 
-            --duration: 2s;
+            --duration: 1.5s;
             --color-glass: rgba(255, 255, 255, 0.2);
             --color-sub-top: #5dade2;
             --color-sub-bottom: #3498db;
@@ -38,11 +38,11 @@
             height: 100%;
             position: relative;
             transform-style: preserve-3d;
-            top: 50%;
+            top: 50%; /* 大卡摺痕中線 */
             cursor: pointer;
         }
 
-        /* 大卡底頁 (下頁) */
+        /* 大卡下頁 (底面) */
         .card-bottom {
             position: absolute;
             top: 0;
@@ -51,10 +51,9 @@
             background: var(--color-glass);
             border: 2px dashed rgba(255,255,255,0.3);
             transform-style: preserve-3d;
-            transform: translateZ(-1px);
         }
 
-        /* 大卡蓋子 (上頁) */
+        /* 大卡上頁 (蓋子) */
         .card-top {
             position: absolute;
             bottom: 0;
@@ -62,12 +61,13 @@
             width: 100%;
             height: var(--card-h);
             transform-origin: bottom;
-            transform: rotateX(-180deg);
+            transform: rotateX(-180deg); /* 閉合 */
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
             z-index: 5;
         }
 
+        /* 大卡打開 90 度 */
         .card-system.is-open .card-top {
             transform: rotateX(-90deg);
         }
@@ -81,7 +81,7 @@
             transform-style: preserve-3d;
         }
 
-        /* 小卡容器：固定在下頁紫色邊 */
+        /* 小卡容器：固定於下頁紫色線 */
         .sub-card-container {
             position: absolute;
             left: 50%;
@@ -93,7 +93,7 @@
             z-index: 10;
         }
 
-        /* 修正：小卡下頁應「向上」旋轉立起 */
+        /* 小卡下半部：軸心在底部固定邊 */
         .sub-bottom {
             position: absolute;
             width: 100%;
@@ -105,10 +105,10 @@
             transform-style: preserve-3d;
         }
 
-        /* 修正：小卡上頁應朝「反方向」摺疊以保持垂直 */
+        /* 小卡上半部：軸心在中央紅線 (中摺痕) */
         .sub-top {
             position: absolute;
-            bottom: 100%; /* 小卡中線摺痕 (紅線) */
+            bottom: 100%; 
             width: 100%;
             height: var(--sub-h);
             background: var(--color-sub-top);
@@ -118,16 +118,16 @@
             transform-style: preserve-3d;
         }
 
-        /* --- 修正後的連動方向邏輯 --- */
+        /* --- 連動邏輯修正 --- */
 
-        /* 小卡下頁：旋轉 -90 度使其垂直向上立起 */
+        /* 當大卡打開 90 度，小卡下半部轉 90 度，使其與大卡底面垂直 */
         .card-system.is-open .sub-bottom {
-            transform: rotateX(-90deg);
+            transform: rotateX(-90deg); 
         }
 
-        /* 小卡上頁：相對旋轉 90 度，使其與大卡上頁內面呈現 90 度垂直 */
+        /* 小卡上半部相對摺回 90 度，使其與大卡蓋子內側垂直 */
         .card-system.is-open .sub-top {
-            transform: rotateX(90deg);
+            transform: rotateX(90deg); 
         }
 
     </style>
