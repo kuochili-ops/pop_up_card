@@ -3,20 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book：完整內頁觀察版</title>
+    <title>Pop-up Book：合攏至立起程序修正</title>
     <style>
         :root {
             --card-w: 350px;
             --card-h: 220px;
             --sub-w: 120px;
             --sub-h: 80px; 
-            --duration: 1.5s;
-            /* 大卡使用極低透明度，模擬透明玻璃感 */
-            --color-inner-alpha: rgba(255, 255, 255, 0.2); 
+            --duration: 1.2s;
+            --color-inner-alpha: rgba(255, 255, 255, 0.4); 
             --color-sub-top: #5dade2;
             --color-sub-bottom: #3498db;
-            /* 下邊附著處往大卡摺痕移動的距離 (紫色邊) */
-            --anchor-offset: 30px; 
+            /* 小卡固定點距離中摺線的位移 */
+            --anchor-offset: 40px; 
         }
 
         body {
@@ -33,8 +32,7 @@
             width: var(--card-w);
             height: var(--card-h);
             transform-style: preserve-3d;
-            /* 調整視角，更清楚地看見內頁深度 */
-            transform: rotateX(30deg) rotateY(-20deg);
+            transform: rotateX(25deg) rotateY(-15deg);
         }
 
         .card-system {
@@ -53,44 +51,43 @@
             width: 100%;
             height: var(--card-h);
             background: var(--color-inner-alpha);
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            border: 2px dashed rgba(255, 255, 255, 0.5);
             transform-style: preserve-3d;
         }
 
         /* 大卡上頁 (蓋子) */
         .card-top {
             position: absolute;
-            bottom: 0; 
+            bottom: 0; /* 軸心在大卡摺痕 */
             width: 100%;
             height: var(--card-h);
             background: var(--color-inner-alpha);
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            border: 2px dashed rgba(255, 255, 255, 0.5);
             transform-origin: bottom;
-            /* 初始狀態：-180度，完全攤平，露出完整內頁 */
-            transform: rotateX(-180deg); 
+            /* 初始狀態：完全合起，蓋在下頁上 */
+            transform: rotateX(0deg); 
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
             z-index: 10;
         }
 
-        /* 點擊後：立起至 90 度 (與底面垂直) */
+        /* 開啟程序：向上翻轉 90 度 */
         .card-top.is-open {
             transform: rotateX(-90deg);
         }
 
-        /* --- 小卡結構：初始為平貼摺疊 --- */
+        /* --- 小卡結構：起始為摺疊狀態 --- */
 
         .sub-bottom {
             position: absolute;
             left: 50%;
-            /* 紫色邊固定點 */
             top: var(--anchor-offset); 
             width: var(--sub-w);
             height: var(--sub-h);
             background: var(--color-sub-bottom);
             transform-origin: bottom; 
-            /* 初始：平貼在大卡底頁上 */
-            transform: translateX(-50%) rotateX(0deg);
+            /* 初始：大卡合起時，小卡下段貼在大卡底面上 */
+            transform: translateX(-50%) rotateX(0deg); 
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
             border: 1px solid #2980b9;
@@ -104,22 +101,23 @@
             height: var(--sub-h);
             background: var(--color-sub-top);
             transform-origin: bottom;
-            /* 初始：反向平貼，與下半部重疊 */
-            transform: rotateX(0deg); 
+            /* 初始關鍵：大卡合起時，小卡上段與下段是摺疊疊合的 (180度) */
+            transform: rotateX(180deg); 
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             border: 1px solid #2980b9;
         }
 
-        /* --- 連動邏輯：立起大卡時拉開小卡 --- */
+        /* --- 連動邏輯：同步撐開 --- */
 
+        /* 當大卡上翻 90 度時，小卡也同步張開 */
         .card-top.is-open ~ .sub-bottom {
-            /* 向上彈起至 V 型 */
-            transform: translateX(-50%) rotateX(120deg);
+            /* 下段立起角度，需補償 anchor-offset 造成的斜度 */
+            transform: translateX(-50%) rotateX(90deg); 
         }
 
         .card-top.is-open ~ .sub-bottom .sub-top {
-            /* 相對摺疊，頂端會剛好對準立起後的蓋子位置 */
-            transform: rotateX(-120deg);
+            /* 上段相對下段轉回，形成與底面平行的方塊頂蓋 */
+            transform: rotateX(-90deg);
         }
 
     </style>
