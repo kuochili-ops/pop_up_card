@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book: V-Fold Fixed Position</title>
+    <title>Pop-up Book：立體方塊連動修正版</title>
     <style>
         :root {
             --card-w: 350px;
@@ -38,11 +38,11 @@
             height: 100%;
             position: relative;
             transform-style: preserve-3d;
-            top: 50%;
+            top: 50%; /* 大卡中線 */
             cursor: pointer;
         }
 
-        /* 大卡底頁 (下頁) */
+        /* 大卡底面 (下半頁) */
         .card-bottom {
             position: absolute;
             top: 0;
@@ -50,12 +50,9 @@
             height: var(--card-h);
             background: var(--color-inner);
             border: 1px solid #ccc;
-            transform-style: preserve-3d;
-            /* 稍微往後退一點，避免閃爍 */
-            transform: translateZ(-1px); 
         }
 
-        /* 大卡上頁 (蓋子) */
+        /* 大卡蓋子 (上半頁) */
         .card-top {
             position: absolute;
             bottom: 0;
@@ -66,51 +63,44 @@
             transform: rotateX(-180deg);
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
-            z-index: 1; /* 初始較低，避免擋住 */
+            z-index: 10;
         }
 
         .card-top.is-open {
             transform: rotateX(-90deg);
         }
 
-        .face.back { 
-            background: var(--color-inner); 
-            position: absolute; 
-            width: 100%; 
-            height: 100%; 
-            transform-style: preserve-3d; 
-            backface-visibility: hidden;
-        }
+        .face.back { background: var(--color-inner); position: absolute; width: 100%; height: 100%; backface-visibility: hidden; }
 
-        /* --- 小卡模組：精確定位與層級優化 --- */
-
-        .v-fold-bridge {
+        /* --- 核心修正：小卡獨立結構 --- */
+        .sub-card-anchor {
             position: absolute;
             left: 50%;
-            /* 修正：下邊附著在距離中線一個 sub-h 的紫色標記處 */
+            /* 修正：紫色邊附著在下半頁，距離中線剛好一個 sub-h */
             top: var(--sub-h); 
             width: var(--sub-w);
             height: var(--sub-h);
+            transform: translateX(-50%);
             transform-style: preserve-3d;
-            transform: translateX(-50%) translateZ(2px); /* 確保在平面之上 */
-            pointer-events: none;
         }
 
+        /* 下小卡：固定在大卡底面 (紫色邊為軸心) */
         .sub-bottom {
             position: absolute;
             width: 100%;
             height: 100%;
             background: var(--color-sub-bottom);
-            transform-origin: bottom;
+            transform-origin: bottom; 
             transform: rotateX(0deg);
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
             border: 1px solid #2980b9;
         }
 
+        /* 上小卡：固定在下小卡頂端 (紅線摺痕為軸心) */
         .sub-top {
             position: absolute;
-            bottom: 100%; /* 紅線摺痕 */
+            bottom: 100%; 
             width: 100%;
             height: var(--sub-h);
             background: var(--color-sub-top);
@@ -118,15 +108,16 @@
             transform: rotateX(0deg);
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             border: 1px solid #2980b9;
-            transform-style: preserve-3d;
         }
 
-        /* --- 連動邏輯 --- */
-        .card-top.is-open ~ .v-fold-bridge .sub-bottom {
+        /* --- 連動邏輯：開啟時小卡自動撐開 --- */
+        .card-top.is-open ~ .sub-card-anchor .sub-bottom {
+            /* 立起 45 度 */
             transform: rotateX(45deg);
         }
 
-        .card-top.is-open ~ .v-fold-bridge .sub-bottom .sub-top {
+        .card-top.is-open ~ .sub-card-anchor .sub-bottom .sub-top {
+            /* 向後折 90 度，頂端會剛好碰到大卡蓋子的紫色位置 */
             transform: rotateX(-90deg);
         }
 
@@ -143,7 +134,7 @@
                 <div class="face back"></div>
             </div>
 
-            <div class="v-fold-bridge">
+            <div class="sub-card-anchor">
                 <div class="sub-bottom">
                     <div class="sub-top"></div>
                 </div>
