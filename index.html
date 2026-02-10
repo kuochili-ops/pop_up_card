@@ -3,18 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book：1/4 尺寸 V-Fold 連動</title>
+    <title>Pop-up Book：一體式摺疊小卡</title>
     <style>
         :root {
             --card-w: 350px;
             --card-h: 220px;
-            /* 小卡尺寸為原大卡（寬度 350px）的 1/4 */
+            /* 小卡寬度為大卡 1/4 */
             --sub-w: calc(350px / 4); 
-            --sub-h: 80px; 
+            /* 小卡兩段展開後的總長度，每一段為 sub-h */
+            --sub-h: 60px; 
             --duration: 1.5s;
             --color-inner: #fdfcf0;
             --color-sub: #3498db;
-            /* 小卡固定點距離大卡中摺線的位移 */
+            /* 兩端短邊固定在離中線各 60px 的位置 */
             --anchor-offset: 60px; 
         }
 
@@ -83,46 +84,48 @@
         .face.front { background: #e74c3c; transform: rotateX(180deg); }
         .face.back { background: var(--color-inner); transform-style: preserve-3d; }
 
-        /* --- 小卡下段：貼附在底頁 --- */
-        .sub-v-bottom {
+        /* --- 一體式小卡：下段 (固定在底頁) --- */
+        .sub-card-container {
             position: absolute;
             left: 50%;
             top: var(--anchor-offset); 
             width: var(--sub-w);
             height: var(--sub-h);
             background: var(--color-sub);
-            /* 固定邊（短邊）貼附在大卡底頁 */
-            transform-origin: top; 
+            transform-origin: top; /* 這是第一個短邊貼附點 */
             transform: translateX(-50%) rotateX(0deg);
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
             border: 1px solid #2980b9;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
         }
 
-        /* 開啟時，下段繞著固定邊向上翻轉 */
-        .card-top.is-open ~ .sub-v-bottom {
+        /* --- 一體式小卡：上段 (銜接在下段末端) --- */
+        .sub-card-upper {
+            position: absolute;
+            top: 100%; /* 從下段的底部接合 */
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #5dade2;
+            transform-origin: top; /* 這是兩頁中間的摺痕 */
+            /* 初始狀態小卡是摺疊平貼的 (180度) */
+            transform: rotateX(180deg); 
+            transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid #2980b9;
+        }
+
+        /* --- 連動邏輯 --- */
+        /* 當大卡打開時：
+           1. 下段向上轉約 45 度 
+           2. 上段相對於下段「打開」回到與大卡內頁平行的位置
+        */
+        .card-top.is-open ~ .sub-card-container {
             transform: translateX(-50%) rotateX(45deg);
         }
 
-        /* --- 小卡上段：貼附在大卡內頁 --- */
-        .sub-v-top {
-            position: absolute;
-            left: 50%;
-            bottom: var(--anchor-offset); 
-            width: var(--sub-w);
-            height: var(--sub-h);
-            background: #5dade2;
-            /* 固定邊（短邊）貼附在大卡內頁 */
-            transform-origin: bottom; 
-            transform: translateX(-50%) rotateX(0deg);
-            transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid #2980b9;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
-        }
-
-        /* 開啟時，上段繞著固定邊向內翻轉，並與下段匯合 */
-        .card-top.is-open .sub-v-top {
-            transform: translateX(-50%) rotateX(-45deg);
+        .card-top.is-open ~ .sub-card-container .sub-card-upper {
+            /* 讓上段轉開，使其末端剛好貼在大卡內頁上 */
+            transform: rotateX(-90deg);
         }
 
     </style>
@@ -134,13 +137,13 @@
             
             <div class="card-bottom"></div>
             
-            <div class="sub-v-bottom"></div>
+            <div class="sub-card-container">
+                <div class="sub-card-upper"></div>
+            </div>
 
             <div class="card-top" id="cardTop">
                 <div class="face front"></div>
-                <div class="face back">
-                    <div class="sub-v-top"></div>
-                </div>
+                <div class="face back"></div>
             </div>
 
         </div>
