@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book：階梯式立體連動</title>
+    <title>Pop-up Book：階梯式立體連動修正</title>
     <style>
         :root {
             --card-w: 350px;
@@ -104,7 +104,7 @@
             width: 100%;
             height: var(--sub-h);
             background: #5dade2;
-            /* 紫色摺痕：軸心在與下半段接合的底邊 */
+            /* 紫色摺痕：軸心在底邊 */
             transform-origin: bottom; 
             transform: rotateX(0deg); 
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
@@ -113,14 +113,13 @@
 
         /* --- 連動動態：強制撐開立體空間 --- */
 
-        /* 當大卡打開到 90 度時 */
         .card-top.is-open ~ .sub-bottom {
             /* 下半段向上翹起 90 度，完全離開底面 */
             transform: translateX(-50%) rotateX(-90deg);
         }
 
         .card-top.is-open ~ .sub-bottom .sub-top {
-            /* 上半段相對下半段再摺疊 90 度，末端剛好貼在大卡蓋子面上 */
+            /* 上半段相對下半段再摺疊 90 度，頂端邊緣將貼合蓋面 */
             transform: rotateX(-90deg);
         }
 
