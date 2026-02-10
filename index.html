@@ -3,20 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book：附著點微調版</title>
+    <title>Pop-up Book：透明觀測與同步摺疊版</title>
     <style>
         :root {
             --card-w: 350px;
             --card-h: 220px;
             --sub-w: 120px;
             --sub-h: 80px; 
-            --duration: 1.5s;
-            --color-inner: #fdfcf0;
+            --duration: 2s; /* 慢速演示以便觀察 */
+            --color-inner-alpha: rgba(255, 255, 255, 0.4); /* 大卡半透明 */
             --color-sub-top: #5dade2;
             --color-sub-bottom: #3498db;
-            
-            /* 修正：將下邊附著處往大卡摺痕(中線)移動 */
-            /* 數值越小，小卡離中線越近。原本是 40px，現在改為 20px */
             --anchor-offset: 20px; 
         }
 
@@ -46,18 +43,18 @@
             cursor: pointer;
         }
 
-        /* 大卡底頁 */
+        /* 大卡底頁：半透明 */
         .card-bottom {
             position: absolute;
             top: 0;
             width: 100%;
             height: var(--card-h);
-            background: var(--color-inner);
-            border: 1px solid #ccc;
+            background: var(--color-inner-alpha);
+            border: 2px dashed rgba(255, 255, 255, 0.6);
             transform-style: preserve-3d;
         }
 
-        /* 大卡上頁 (蓋子) */
+        /* 大卡上頁 (蓋子)：半透明 */
         .card-top {
             position: absolute;
             bottom: 0;
@@ -65,26 +62,27 @@
             width: 100%;
             height: var(--card-h);
             transform-origin: bottom;
-            transform: rotateX(-180deg);
+            transform: rotateX(-180deg); /* 初始閉合 */
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
             z-index: 10;
         }
 
         .card-top.is-open {
-            transform: rotateX(-90deg);
+            transform: rotateX(-90deg); /* 開啟至 90 度 */
         }
 
         .face.back { 
-            background: var(--color-inner); 
+            background: var(--color-inner-alpha); 
             position: absolute; 
             width: 100%; 
             height: 100%; 
+            border: 2px dashed rgba(255, 255, 255, 0.6);
             transform-style: preserve-3d; 
             backface-visibility: hidden;
         }
 
-        /* --- 小卡結構 --- */
+        /* --- 小卡結構與摺疊狀態 --- */
         .sub-card-container {
             position: absolute;
             left: 50%;
@@ -96,6 +94,7 @@
             pointer-events: none;
         }
 
+        /* 小卡下半部：初始與大卡底面平行 (0deg) */
         .sub-bottom {
             position: absolute;
             width: 100%;
@@ -108,6 +107,7 @@
             border: 1px solid #2980b9;
         }
 
+        /* 小卡上半部：初始與下半部重疊 (0deg) */
         .sub-top {
             position: absolute;
             bottom: 100%; 
@@ -120,15 +120,14 @@
             border: 1px solid #2980b9;
         }
 
-        /* --- 開合連動邏輯 --- */
+        /* --- 連動邏輯 --- */
         
+        /* 當大卡 is-open 時，小卡才展開 */
         .card-top.is-open ~ .sub-card-container .sub-bottom {
-            /* 為了補償縮短的位移，角度調整為讓小卡能接觸到開啟後的蓋子 */
             transform: rotateX(125deg); 
         }
 
         .card-top.is-open ~ .sub-card-container .sub-bottom .sub-top {
-            /* 對應的角度補償 */
             transform: rotateX(-125deg); 
         }
 
@@ -138,15 +137,19 @@
 
     <div class="scene">
         <div class="card-system" onclick="this.querySelector('.card-top').classList.toggle('is-open')">
+            
             <div class="card-bottom"></div>
+
             <div class="card-top">
                 <div class="face back"></div>
             </div>
+
             <div class="sub-card-container">
                 <div class="sub-bottom">
                     <div class="sub-top"></div>
                 </div>
             </div>
+
         </div>
     </div>
 
