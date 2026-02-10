@@ -3,13 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book：基礎大卡結構</title>
+    <title>Pop-up Book：1/4 尺寸 V-Fold 連動</title>
     <style>
         :root {
             --card-w: 350px;
             --card-h: 220px;
+            /* 小卡尺寸為原大卡（寬度 350px）的 1/4 */
+            --sub-w: calc(350px / 4); 
+            --sub-h: 80px; 
             --duration: 1.5s;
             --color-inner: #fdfcf0;
+            --color-sub: #3498db;
+            /* 小卡固定點距離大卡中摺線的位移 */
+            --anchor-offset: 60px; 
         }
 
         body {
@@ -57,14 +63,12 @@
             width: 100%;
             height: var(--card-h);
             transform-origin: bottom;
-            /* 初始狀態：完全攤平 (-180度) */
             transform: rotateX(-180deg);
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
             z-index: 10;
         }
 
-        /* 點擊後：掀起至 90 度垂直狀態 */
         .card-top.is-open {
             transform: rotateX(-90deg);
         }
@@ -76,14 +80,49 @@
             backface-visibility: hidden;
             border: 1px solid #ccc;
         }
-        /* 封面 */
-        .face.front { 
-            background: #e74c3c; 
-            transform: rotateX(180deg); 
+        .face.front { background: #e74c3c; transform: rotateX(180deg); }
+        .face.back { background: var(--color-inner); transform-style: preserve-3d; }
+
+        /* --- 小卡下段：貼附在底頁 --- */
+        .sub-v-bottom {
+            position: absolute;
+            left: 50%;
+            top: var(--anchor-offset); 
+            width: var(--sub-w);
+            height: var(--sub-h);
+            background: var(--color-sub);
+            /* 固定邊（短邊）貼附在大卡底頁 */
+            transform-origin: top; 
+            transform: translateX(-50%) rotateX(0deg);
+            transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid #2980b9;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
         }
-        /* 內頁 */
-        .face.back { 
-            background: var(--color-inner); 
+
+        /* 開啟時，下段繞著固定邊向上翻轉 */
+        .card-top.is-open ~ .sub-v-bottom {
+            transform: translateX(-50%) rotateX(45deg);
+        }
+
+        /* --- 小卡上段：貼附在大卡內頁 --- */
+        .sub-v-top {
+            position: absolute;
+            left: 50%;
+            bottom: var(--anchor-offset); 
+            width: var(--sub-w);
+            height: var(--sub-h);
+            background: #5dade2;
+            /* 固定邊（短邊）貼附在大卡內頁 */
+            transform-origin: bottom; 
+            transform: translateX(-50%) rotateX(0deg);
+            transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid #2980b9;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        /* 開啟時，上段繞著固定邊向內翻轉，並與下段匯合 */
+        .card-top.is-open .sub-v-top {
+            transform: translateX(-50%) rotateX(-45deg);
         }
 
     </style>
@@ -95,9 +134,13 @@
             
             <div class="card-bottom"></div>
             
+            <div class="sub-v-bottom"></div>
+
             <div class="card-top" id="cardTop">
                 <div class="face front"></div>
-                <div class="face back"></div>
+                <div class="face back">
+                    <div class="sub-v-top"></div>
+                </div>
             </div>
 
         </div>
