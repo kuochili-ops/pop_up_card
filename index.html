@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book：小卡物理摺痕連動</title>
+    <title>Pop-up Book：平行摺疊物理連動版</title>
     <style>
         :root {
             --card-w: 350px;
@@ -14,8 +14,8 @@
             --color-inner: #fdfcf0;
             --color-sub: #3498db;
             --color-sub-alt: #5dade2;
-            /* 小卡與中心摺痕的距離 */
-            --anchor-offset: 40px; 
+            /* 紅色旋轉軸距離大卡中摺線的距離 */
+            --anchor-offset: 80px; 
         }
 
         body {
@@ -80,37 +80,37 @@
         .face.front { background: #e74c3c; transform: rotateX(180deg); }
         .face.back { background: var(--color-inner); transform-style: preserve-3d; }
 
-        /* --- 下半頁：紅色標記邊為軸心 (top) --- */
+        /* --- 小卡下半頁：軸心在紅色標記邊 (bottom) --- */
         .sub-bottom {
             position: absolute;
             left: 50%;
-            /* 軸心固定在底面上距離中摺線 --anchor-offset 的位置 */
+            /* 固定在底面上，軸心距離中心線 --anchor-offset */
             top: var(--anchor-offset); 
             width: var(--sub-w);
             height: var(--sub-h);
             background: var(--color-sub);
-            /* 紅色標記邊：設定軸心在頂部 */
-            transform-origin: top; 
+            /* 紅色標記邊為軸：設定在元素的底部 */
+            transform-origin: bottom; 
             transform: translateX(-50%) rotateX(0deg);
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             border: 1px solid #2980b9;
         }
 
         .card-top.is-open ~ .sub-bottom {
-            /* 向上方轉動 90 度立起，紫色標記邊會懸空 */
-            transform: translateX(-50%) rotateX(90deg);
+            /* 向上翻轉 90 度，紫色標記邊會立起至空中 */
+            transform: translateX(-50%) rotateX(-90deg);
         }
 
-        /* --- 上半頁：紫色標記邊連在一起 --- */
+        /* --- 小卡上半頁：紫色標記邊與下半頁連動 --- */
         .sub-top {
             position: absolute;
             left: 50%;
-            /* 上半頁軸心固定在蓋子內面上同樣高度，旋轉後底邊與下半頁相接 */
+            /* 上半頁軸心固定在內頁，位置與下半頁對稱 */
             bottom: var(--anchor-offset);
             width: var(--sub-w);
             height: var(--sub-h);
             background: var(--color-sub-alt);
-            /* 設定軸心在蓋子連接邊 (top) */
+            /* 固定邊在頂部，紫色邊(底部)隨之轉動 */
             transform-origin: top; 
             transform: translateX(-50%) rotateX(0deg); 
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
@@ -118,7 +118,7 @@
         }
 
         .card-top.is-open .sub-top {
-            /* 隨著大卡立起，上半頁向內摺疊 90 度，底邊(紫色)剛好與下半頁底邊接合 */
+            /* 相對於大卡內頁翻轉，使紫色邊與 sub-bottom 匯合 */
             transform: translateX(-50%) rotateX(90deg);
         }
 
