@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Module: V-Fold Precision</title>
+    <title>Pop-up Book: V-Fold Fixed Position</title>
     <style>
         :root {
             --card-w: 350px;
@@ -26,7 +26,6 @@
             perspective: 2500px;
         }
 
-        /* --- 基礎場景容器 --- */
         .scene {
             width: var(--card-w);
             height: var(--card-h);
@@ -34,16 +33,16 @@
             transform: rotateX(25deg) rotateY(-15deg);
         }
 
-        /* --- 大卡系統模組 --- */
         .card-system {
             width: 100%;
             height: 100%;
             position: relative;
             transform-style: preserve-3d;
-            top: 50%; /* 摺痕中線 */
+            top: 50%;
             cursor: pointer;
         }
 
+        /* 大卡底頁 (下頁) */
         .card-bottom {
             position: absolute;
             top: 0;
@@ -52,8 +51,11 @@
             background: var(--color-inner);
             border: 1px solid #ccc;
             transform-style: preserve-3d;
+            /* 稍微往後退一點，避免閃爍 */
+            transform: translateZ(-1px); 
         }
 
+        /* 大卡上頁 (蓋子) */
         .card-top {
             position: absolute;
             bottom: 0;
@@ -64,7 +66,7 @@
             transform: rotateX(-180deg);
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
-            z-index: 10;
+            z-index: 1; /* 初始較低，避免擋住 */
         }
 
         .card-top.is-open {
@@ -80,55 +82,51 @@
             backface-visibility: hidden;
         }
 
-        /* --- V-FOLD 模組核心：小卡連動系統 --- */
-        
-        /* 1. 下端定位容器 (紫色標記處修正) */
+        /* --- 小卡模組：精確定位與層級優化 --- */
+
         .v-fold-bridge {
             position: absolute;
             left: 50%;
-            /* 修正：下邊附著點距離中線剛好一個 sub-h */
+            /* 修正：下邊附著在距離中線一個 sub-h 的紫色標記處 */
             top: var(--sub-h); 
             width: var(--sub-w);
             height: var(--sub-h);
             transform-style: preserve-3d;
-            transform: translateX(-50%);
-            pointer-events: none; /* 防止干擾點擊 */
+            transform: translateX(-50%) translateZ(2px); /* 確保在平面之上 */
+            pointer-events: none;
         }
 
-        /* 2. 小卡下半部 (紫色邊為軸心) */
         .sub-bottom {
             position: absolute;
             width: 100%;
             height: 100%;
             background: var(--color-sub-bottom);
-            transform-origin: bottom; /* 紫色固定邊 */
+            transform-origin: bottom;
             transform: rotateX(0deg);
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
             border: 1px solid #2980b9;
         }
 
-        /* 3. 小卡上半部 (接合紅線為軸心) */
         .sub-top {
             position: absolute;
-            bottom: 100%; /* 紅線位置 */
+            bottom: 100%; /* 紅線摺痕 */
             width: 100%;
             height: var(--sub-h);
             background: var(--color-sub-top);
-            transform-origin: bottom; /* 以紅線為軸心旋轉 */
+            transform-origin: bottom;
             transform: rotateX(0deg);
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             border: 1px solid #2980b9;
+            transform-style: preserve-3d;
         }
 
-        /* --- 連動動畫：模擬物理拉扯 --- */
+        /* --- 連動邏輯 --- */
         .card-top.is-open ~ .v-fold-bridge .sub-bottom {
-            /* 下半面立起 45 度 */
             transform: rotateX(45deg);
         }
 
         .card-top.is-open ~ .v-fold-bridge .sub-bottom .sub-top {
-            /* 上半面相對摺疊 90 度，上緣自動對齊上內頁 */
             transform: rotateX(-90deg);
         }
 
