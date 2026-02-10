@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book：0-90度精確連動版</title>
+    <title>Pop-up Book：回歸原始邏輯修正</title>
     <style>
         :root {
             --card-w: 350px;
@@ -14,8 +14,6 @@
             --color-inner: #fdfcf0;
             --color-sub: #3498db;
             --color-sub-alt: #5dade2;
-            /* 固定點距離中線的位移 */
-            --anchor-offset: 80px; 
         }
 
         body {
@@ -32,8 +30,8 @@
             width: var(--card-w);
             height: var(--card-h);
             transform-style: preserve-3d;
-            /* 調整場景視角，讓立起後的 90 度面正對觀察者 */
-            transform: rotateX(65deg) rotateY(-15deg);
+            /* 調整視角以觀察 0-90 度的變化 */
+            transform: rotateX(45deg) rotateY(-15deg);
         }
 
         .card-system {
@@ -42,10 +40,8 @@
             position: relative;
             transform-style: preserve-3d;
             top: 50%;
-            cursor: pointer;
         }
 
-        /* 大卡底頁 */
         .card-bottom {
             position: absolute;
             top: 0;
@@ -56,7 +52,6 @@
             transform-style: preserve-3d;
         }
 
-        /* 大卡上頁 (蓋子) */
         .card-top {
             position: absolute;
             bottom: 0;
@@ -64,14 +59,14 @@
             width: 100%;
             height: var(--card-h);
             transform-origin: bottom;
-            /* 初始：0度（合起） */
+            /* 修正 1：初始 0 度 (蓋住) */
             transform: rotateX(0deg); 
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
             z-index: 10;
         }
 
-        /* 點擊後：開啟 90 度（立起） */
+        /* 修正 2：開啟 90 度 (立起) */
         .card-top.is-open {
             transform: rotateX(90deg);
         }
@@ -83,16 +78,17 @@
             backface-visibility: hidden;
             border: 1px solid #ccc;
         }
-        /* 外頁 */
-        .face.front { background: #e74c3c; transform: rotateY(0deg); }
-        /* 內頁 */
-        .face.back { background: var(--color-inner); transform: rotateY(180deg); transform-style: preserve-3d; }
+        /* 外頁面朝上 */
+        .face.front { background: #e74c3c; transform: rotateX(0deg); }
+        /* 內頁面翻轉到背面 */
+        .face.back { background: var(--color-inner); transform: rotateX(180deg); transform-style: preserve-3d; }
 
-        /* --- 小卡下半部：固定在底頁 --- */
+        /* --- 小卡下半面：維持你的邏輯 --- */
         .sub-bottom {
             position: absolute;
             left: 50%;
-            top: var(--anchor-offset); 
+            /* 修正 3：位置與 sub-h 對齊以確保旋轉後高度正確 */
+            top: var(--sub-h); 
             width: var(--sub-w);
             height: var(--sub-h);
             background: var(--color-sub);
@@ -102,17 +98,17 @@
             border: 1px solid #2980b9;
         }
 
-        /* 當大卡開啟 90 度，下半部向觀眾立起 90 度 */
         .card-top.is-open ~ .sub-bottom {
-            transform: translateX(-50%) rotateX(90deg);
+            /* 向觀眾方向立起 90 度 */
+            transform: translateX(-50%) rotateX(-90deg);
         }
 
-        /* --- 小卡上半部：固定在蓋子內頁 --- */
+        /* --- 小卡上半面：嵌套在 card-top 內 --- */
         .sub-top {
             position: absolute;
             left: 50%;
-            /* 距離蓋子底部(摺線)的位移 */
-            bottom: var(--anchor-offset);
+            /* 修正 4：位置必須對稱，距離蓋子軸心也是 sub-h */
+            bottom: var(--sub-h);
             width: var(--sub-w);
             height: var(--sub-h);
             background: var(--color-sub-alt);
@@ -122,9 +118,9 @@
             border: 1px solid #2980b9;
         }
 
-        /* 當大卡開啟 90 度，上半部往大卡內頁另一邊旋轉 90 度 */
         .card-top.is-open .sub-top {
-            transform: translateX(-50%) rotateX(90deg);
+            /* 修正 5：大卡轉 90 度時，它反向轉 -90 度，剛好與 sub-bottom 銜接 */
+            transform: translateX(-50%) rotateX(-90deg);
         }
 
     </style>
@@ -133,18 +129,14 @@
 
     <div class="scene">
         <div class="card-system" onclick="document.getElementById('cardTop').classList.toggle('is-open')">
-            
             <div class="card-bottom"></div>
-            
             <div class="sub-bottom"></div>
-
             <div class="card-top" id="cardTop">
                 <div class="face front"></div>
                 <div class="face back">
                     <div class="sub-top"></div>
                 </div>
             </div>
-
         </div>
     </div>
 
