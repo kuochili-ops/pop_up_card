@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book: 90度平行摺疊觀察</title>
+    <title>Pop-up Book：連動修正版</title>
     <style>
         :root {
             --card-w: 350px;
             --card-h: 220px;
             --sub-w: 120px;
             --sub-h: 80px; 
-            --duration: 2s;
+            --duration: 1.5s;
             --color-glass: rgba(255, 255, 255, 0.2);
             --color-sub-top: #5dade2;
             --color-sub-bottom: #3498db;
@@ -38,11 +38,11 @@
             height: 100%;
             position: relative;
             transform-style: preserve-3d;
-            top: 50%; /* 大卡摺痕線 */
+            top: 50%;
             cursor: pointer;
         }
 
-        /* 大卡下頁 (底面) */
+        /* 大卡下頁面 (底) */
         .card-bottom {
             position: absolute;
             top: 0;
@@ -53,7 +53,7 @@
             transform-style: preserve-3d;
         }
 
-        /* 大卡上頁 (蓋子) */
+        /* 大卡上頁面 (蓋子) */
         .card-top {
             position: absolute;
             bottom: 0;
@@ -61,14 +61,15 @@
             width: 100%;
             height: var(--card-h);
             transform-origin: bottom;
-            transform: rotateX(-180deg); /* 初始閉合在內側 */
+            transform: rotateX(-180deg); /* 閉合 */
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
             z-index: 5;
         }
 
-        .card-top.is-open {
-            transform: rotateX(-90deg); /* 打開到 90 度 */
+        /* 當父層 card-system 有 is-open 時，大卡打開 */
+        .card-system.is-open .card-top {
+            transform: rotateX(-90deg);
         }
 
         .face.back { 
@@ -80,51 +81,50 @@
             transform-style: preserve-3d;
         }
 
-        /* --- 小卡結構：摺痕遠離大卡中線 --- */
+        /* 小卡容器 */
         .sub-card-container {
             position: absolute;
             left: 50%;
-            /* 紫色固定邊：在大卡下頁上，距離中線 sub-h 的位置 */
-            top: var(--sub-h); 
+            top: var(--sub-h); /* 紫色固定邊距離中線位置 */
             width: var(--sub-w);
             height: var(--sub-h);
             transform: translateX(-50%) translateZ(1px);
             transform-style: preserve-3d;
+            z-index: 10;
         }
 
-        /* 小卡下頁：與大卡下頁呈 90 度 */
         .sub-bottom {
             position: absolute;
             width: 100%;
             height: 100%;
             background: var(--color-sub-bottom);
-            transform-origin: bottom; /* 紫色固定邊為軸 */
+            transform-origin: bottom;
             transform: rotateX(0deg);
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
         }
 
-        /* 小卡上頁：與大卡上頁呈 90 度 */
         .sub-top {
             position: absolute;
-            bottom: 100%; /* 小卡摺痕 (紅線) */
+            bottom: 100%; /* 紅線摺痕 */
             width: 100%;
             height: var(--sub-h);
             background: var(--color-sub-top);
-            transform-origin: bottom; /* 小卡摺痕為軸 */
+            transform-origin: bottom;
             transform: rotateX(0deg);
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
         }
 
-        /* --- 連動邏輯 --- */
-        /* 大卡 90 度時，小卡下頁轉 90 度 (垂直於大卡下頁) */
-        .card-top.is-open ~ .sub-card-container .sub-bottom {
+        /* --- 連動邏輯：當父層被點擊時，小卡同步動作 --- */
+        
+        /* 小卡下頁立起 90 度，與大卡底面垂直 */
+        .card-system.is-open .sub-bottom {
             transform: rotateX(90deg);
         }
 
-        /* 小卡上頁相對下頁再轉 -90 度 (垂直於大卡上頁) */
-        .card-top.is-open ~ .sub-card-container .sub-bottom .sub-top {
+        /* 小卡上頁摺回 90 度，與大卡蓋子垂直 */
+        .card-system.is-open .sub-top {
             transform: rotateX(-90deg);
         }
 
@@ -133,7 +133,7 @@
 <body>
 
     <div class="scene">
-        <div class="card-system" onclick="this.querySelector('.card-top').classList.toggle('is-open')">
+        <div class="card-system" onclick="this.classList.toggle('is-open')">
             
             <div class="card-bottom"></div>
 
