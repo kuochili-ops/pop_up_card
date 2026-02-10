@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book：階梯式立體連動修正</title>
+    <title>Pop-up Book：階梯式彈出修正版</title>
     <style>
         :root {
             --card-w: 350px;
             --card-h: 220px;
             --sub-w: 87.5px; /* 1/4 寬度 */
-            --sub-h: 60px;   /* 單段小摺卡高度 */
+            --sub-h: 60px;   /* 單段小摺卡長度 */
             --duration: 1.5s;
             --color-inner: #fdfcf0;
             --color-sub: #3498db;
@@ -78,17 +78,16 @@
         .face.front { background: #e74c3c; transform: rotateX(180deg); }
         .face.back { background: var(--color-inner); transform-style: preserve-3d; }
 
-        /* --- 修正後的小摺卡結構 --- */
+        /* --- 修正的核心：嵌套結構 --- */
 
         .sub-bottom {
             position: absolute;
             left: 50%;
-            /* 貼附在底頁上的紅色軸心位置 */
             top: var(--anchor-dist); 
             width: var(--sub-w);
             height: var(--sub-h);
             background: var(--color-sub);
-            /* 紅色標記軸：軸心在元素底邊 */
+            /* 紅色標記軸：軸心在底部 */
             transform-origin: bottom; 
             transform: translateX(-50%) rotateX(0deg);
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
@@ -98,28 +97,27 @@
 
         .sub-top {
             position: absolute;
-            /* 從下半段的頂端（紫色摺痕）延伸 */
-            bottom: 100%; 
+            bottom: 100%; /* 從下段頂部（紫色摺痕）開始 */
             left: 0;
             width: 100%;
             height: var(--sub-h);
             background: #5dade2;
-            /* 紫色摺痕：軸心在底邊 */
+            /* 紫色標記摺痕：軸心在底邊 */
             transform-origin: bottom; 
             transform: rotateX(0deg); 
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             border: 1px solid #2980b9;
         }
 
-        /* --- 連動動態：強制撐開立體空間 --- */
+        /* --- 連動邏輯：強制產生 3D 階梯 --- */
 
         .card-top.is-open ~ .sub-bottom {
-            /* 下半段向上翹起 90 度，完全離開底面 */
+            /* 下半部立起 90 度，完全垂直於底面 */
             transform: translateX(-50%) rotateX(-90deg);
         }
 
         .card-top.is-open ~ .sub-bottom .sub-top {
-            /* 上半段相對下半段再摺疊 90 度，頂端邊緣將貼合蓋面 */
+            /* 上半部相對於下半部轉 -90 度，變回水平狀態並抵住掀蓋 */
             transform: rotateX(-90deg);
         }
 
