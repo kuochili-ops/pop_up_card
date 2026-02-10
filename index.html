@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book：回歸原始邏輯修正</title>
+    <title>Pop-up Book：下半面向上旋轉修正</title>
     <style>
         :root {
             --card-w: 350px;
@@ -30,8 +30,7 @@
             width: var(--card-w);
             height: var(--card-h);
             transform-style: preserve-3d;
-            /* 調整視角以觀察 0-90 度的變化 */
-            transform: rotateX(45deg) rotateY(-15deg);
+            transform: rotateX(25deg) rotateY(-15deg);
         }
 
         .card-system {
@@ -59,16 +58,14 @@
             width: 100%;
             height: var(--card-h);
             transform-origin: bottom;
-            /* 修正 1：初始 0 度 (蓋住) */
-            transform: rotateX(0deg); 
+            transform: rotateX(-180deg);
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
             z-index: 10;
         }
 
-        /* 修正 2：開啟 90 度 (立起) */
         .card-top.is-open {
-            transform: rotateX(90deg);
+            transform: rotateX(-90deg);
         }
 
         .face {
@@ -78,17 +75,14 @@
             backface-visibility: hidden;
             border: 1px solid #ccc;
         }
-        /* 外頁面朝上 */
-        .face.front { background: #e74c3c; transform: rotateX(0deg); }
-        /* 內頁面翻轉到背面 */
-        .face.back { background: var(--color-inner); transform: rotateX(180deg); transform-style: preserve-3d; }
+        .face.front { background: #e74c3c; transform: rotateX(180deg); }
+        .face.back { background: var(--color-inner); transform-style: preserve-3d; }
 
-        /* --- 小卡下半面：維持你的邏輯 --- */
+        /* --- 修正處：小卡下半面改為正角度，向上翻轉 --- */
         .sub-bottom {
             position: absolute;
             left: 50%;
-            /* 修正 3：位置與 sub-h 對齊以確保旋轉後高度正確 */
-            top: var(--sub-h); 
+            top: 0; /* 修改：讓軸心對齊大卡中摺線 */
             width: var(--sub-w);
             height: var(--sub-h);
             background: var(--color-sub);
@@ -99,16 +93,15 @@
         }
 
         .card-top.is-open ~ .sub-bottom {
-            /* 向觀眾方向立起 90 度 */
-            transform: translateX(-50%) rotateX(-90deg);
+            /* 修正：角度改為正 90 度，使其從底面向上翻起 */
+            transform: translateX(-50%) rotateX(90deg);
         }
 
-        /* --- 小卡上半面：嵌套在 card-top 內 --- */
+        /* --- 小卡上半面維持向蓋子另一邊轉動 --- */
         .sub-top {
             position: absolute;
             left: 50%;
-            /* 修正 4：位置必須對稱，距離蓋子軸心也是 sub-h */
-            bottom: var(--sub-h);
+            bottom: 0; /* 修改：讓軸心對齊大卡中摺線 */
             width: var(--sub-w);
             height: var(--sub-h);
             background: var(--color-sub-alt);
@@ -119,7 +112,7 @@
         }
 
         .card-top.is-open .sub-top {
-            /* 修正 5：大卡轉 90 度時，它反向轉 -90 度，剛好與 sub-bottom 銜接 */
+            /* 維持負角度，向蓋子內側摺疊 */
             transform: translateX(-50%) rotateX(-90deg);
         }
 
