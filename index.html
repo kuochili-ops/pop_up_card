@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book：立體方塊連動修正版</title>
+    <title>Pop-up Book: 物理程序校準</title>
     <style>
         :root {
             --card-w: 350px;
@@ -38,11 +38,11 @@
             height: 100%;
             position: relative;
             transform-style: preserve-3d;
-            top: 50%; /* 大卡中線 */
+            top: 50%; /* 大卡中摺線位置 */
             cursor: pointer;
         }
 
-        /* 大卡底面 (下半頁) */
+        /* 大卡底頁 (下內頁) */
         .card-bottom {
             position: absolute;
             top: 0;
@@ -50,9 +50,10 @@
             height: var(--card-h);
             background: var(--color-inner);
             border: 1px solid #ccc;
+            transform-style: preserve-3d;
         }
 
-        /* 大卡蓋子 (上半頁) */
+        /* 大卡上頁 (蓋子) */
         .card-top {
             position: absolute;
             bottom: 0;
@@ -60,23 +61,31 @@
             width: 100%;
             height: var(--card-h);
             transform-origin: bottom;
-            transform: rotateX(-180deg);
+            transform: rotateX(-180deg); /* 初始閉合狀態 */
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
             z-index: 10;
         }
 
         .card-top.is-open {
-            transform: rotateX(-90deg);
+            transform: rotateX(-90deg); /* 完全開啟至 90 度 */
         }
 
-        .face.back { background: var(--color-inner); position: absolute; width: 100%; height: 100%; backface-visibility: hidden; }
+        .face.back { 
+            background: var(--color-inner); 
+            position: absolute; 
+            width: 100%; 
+            height: 100%; 
+            transform-style: preserve-3d; 
+            backface-visibility: hidden;
+        }
 
-        /* --- 核心修正：小卡獨立結構 --- */
-        .sub-card-anchor {
+        /* --- 小卡連動核心 --- */
+
+        .sub-card-container {
             position: absolute;
             left: 50%;
-            /* 修正：紫色邊附著在下半頁，距離中線剛好一個 sub-h */
+            /* 紫色邊固定位置：距離中線一個小卡高度 */
             top: var(--sub-h); 
             width: var(--sub-w);
             height: var(--sub-h);
@@ -84,41 +93,40 @@
             transform-style: preserve-3d;
         }
 
-        /* 下小卡：固定在大卡底面 (紫色邊為軸心) */
         .sub-bottom {
             position: absolute;
             width: 100%;
             height: 100%;
             background: var(--color-sub-bottom);
-            transform-origin: bottom; 
+            transform-origin: bottom; /* 下紫色邊軸心 */
             transform: rotateX(0deg);
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
             border: 1px solid #2980b9;
         }
 
-        /* 上小卡：固定在下小卡頂端 (紅線摺痕為軸心) */
         .sub-top {
             position: absolute;
-            bottom: 100%; 
+            bottom: 100%; /* 紅線接合點 */
             width: 100%;
             height: var(--sub-h);
             background: var(--color-sub-top);
-            transform-origin: bottom;
+            transform-origin: bottom; /* 紅線軸心 */
             transform: rotateX(0deg);
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             border: 1px solid #2980b9;
         }
 
-        /* --- 連動邏輯：開啟時小卡自動撐開 --- */
-        .card-top.is-open ~ .sub-card-anchor .sub-bottom {
-            /* 立起 45 度 */
-            transform: rotateX(45deg);
+        /* --- 連動邏輯：同步開啟程序 --- */
+
+        /* 1. 當大卡開啟，下半面旋轉立起 */
+        .card-top.is-open ~ .sub-card-container .sub-bottom {
+            transform: rotateX(90deg); /* 垂直於大卡底頁 */
         }
 
-        .card-top.is-open ~ .sub-card-anchor .sub-bottom .sub-top {
-            /* 向後折 90 度，頂端會剛好碰到大卡蓋子的紫色位置 */
-            transform: rotateX(-90deg);
+        /* 2. 上半面相對摺疊，使其頂端剛好貼合上頁 */
+        .card-top.is-open ~ .sub-card-container .sub-bottom .sub-top {
+            transform: rotateX(-90deg); /* 水平狀態 */
         }
 
     </style>
@@ -134,7 +142,7 @@
                 <div class="face back"></div>
             </div>
 
-            <div class="sub-card-anchor">
+            <div class="sub-card-container">
                 <div class="sub-bottom">
                     <div class="sub-top"></div>
                 </div>
