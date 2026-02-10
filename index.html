@@ -3,19 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Module: Sync Step Fold</title>
+    <title>Pop-up Book：階梯式立體連動（正確版）</title>
     <style>
         :root {
-            /* 全域變數：可根據需求調整尺寸 */
             --card-w: 350px;
             --card-h: 220px;
             --sub-w: 87.5px;
             --sub-h: 60px;
             --duration: 1.5s;
             --color-inner: #fdfcf0;
-            --color-deep: #3498db;
-            --color-light: #85c1e9;
-            --anchor-y: 70px; /* 小卡在底頁的固定位置 */
+            --color-deep-blue: #3498db;
+            --color-light-blue: #85c1e9;
+            --anchor-dist: 70px; 
         }
 
         body {
@@ -28,36 +27,38 @@
             perspective: 2500px;
         }
 
-        /* --- 模組核心樣式 --- */
-        .popup-container {
+        .scene {
             width: var(--card-w);
             height: var(--card-h);
             transform-style: preserve-3d;
             transform: rotateX(25deg) rotateY(-15deg);
-            cursor: pointer;
         }
 
-        .main-card {
+        .card-system {
             width: 100%;
             height: 100%;
             position: relative;
             transform-style: preserve-3d;
+            top: 50%;
+            cursor: pointer;
         }
 
-        .base-page {
+        .card-bottom {
             position: absolute;
+            top: 0;
             width: 100%;
-            height: 100%;
+            height: var(--card-h);
             background: var(--color-inner);
             border: 1px solid #ccc;
+            transform-style: preserve-3d;
         }
 
-        .cover-page {
+        .card-top {
             position: absolute;
             bottom: 0;
             top: -100%;
             width: 100%;
-            height: 100%;
+            height: var(--card-h);
             transform-origin: bottom;
             transform: rotateX(-180deg);
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
@@ -65,70 +66,74 @@
             z-index: 10;
         }
 
-        .is-open .cover-page { transform: rotateX(-90deg); }
+        .card-top.is-open { transform: rotateX(-90deg); }
 
         .face {
             position: absolute;
             width: 100%;
             height: 100%;
             backface-visibility: hidden;
+            border: 1px solid #ccc;
         }
-        .face.outer { background: #e74c3c; transform: rotateX(180deg); }
-        .face.inner { background: var(--color-inner); }
+        .face.front { background: #e74c3c; transform: rotateX(180deg); }
+        .face.back { background: var(--color-inner); transform-style: preserve-3d; }
 
-        /* --- 小卡連動模組 --- */
-        .step-fold-module {
+        /* --- 核心正確結構 --- */
+
+        .sub-deep-blue {
             position: absolute;
             left: 50%;
-            top: var(--anchor-y);
+            top: var(--anchor-dist); 
             width: var(--sub-w);
             height: var(--sub-h);
+            background: var(--color-deep-blue);
+            transform-origin: bottom; /* 紅色標記軸 */
             transform: translateX(-50%) rotateX(0deg);
-            transform-origin: bottom;
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
-        }
-
-        .step-primary {
-            width: 100%;
-            height: 100%;
-            background: var(--color-deep);
             border: 1px solid #2980b9;
         }
 
-        .step-secondary {
+        .sub-light-blue {
             position: absolute;
-            top: 0;
+            top: 0; /* 紫色標記摺痕 */
+            left: 0;
             width: 100%;
-            height: 100%;
-            background: var(--color-light);
-            border: 1px solid #5499c7;
-            transform-origin: top;
-            transform: rotateX(0deg);
+            height: var(--sub-h);
+            background: var(--color-light-blue);
+            transform-origin: top; 
+            /* 初始狀態：夾角 0 度，蓋在深藍頁上 */
+            transform: rotateX(0deg); 
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid #5499c7;
         }
 
-        /* 同步觸發器 */
-        .is-open .step-fold-module { transform: translateX(-50%) rotateX(-90deg); }
-        .is-open .step-secondary { transform: rotateX(-90deg); }
+        /* --- 連動邏輯 --- */
+
+        .card-top.is-open ~ .sub-deep-blue {
+            transform: translateX(-50%) rotateX(-90deg);
+        }
+
+        .card-top.is-open ~ .sub-deep-blue .sub-light-blue {
+            /* 向內翻轉 90 度，形成階梯 */
+            transform: rotateX(-90deg);
+        }
 
     </style>
 </head>
 <body>
 
-    <div class="popup-container" onclick="this.classList.toggle('is-open')">
-        <div class="main-card">
-            <div class="base-page"></div>
+    <div class="scene">
+        <div class="card-system" onclick="this.querySelector('.card-top').classList.toggle('is-open')">
+            <div class="card-bottom"></div>
             
-            <div class="cover-page">
-                <div class="face outer"></div>
-                <div class="face inner"></div>
+            <div class="card-top">
+                <div class="face front"></div>
+                <div class="face back"></div>
             </div>
 
-            <div class="step-fold-module">
-                <div class="step-primary">
-                    <div class="step-secondary"></div>
-                </div>
+            <div class="sub-deep-blue">
+                <div class="sub-light-blue"></div>
             </div>
         </div>
     </div>
