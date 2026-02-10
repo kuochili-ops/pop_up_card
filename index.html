@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book：階梯式彈出修正版</title>
+    <title>Pop-up Book：小卡同步連動版</title>
     <style>
         :root {
             --card-w: 350px;
             --card-h: 220px;
             --sub-w: 87.5px; /* 1/4 寬度 */
-            --sub-h: 60px;   /* 單段小摺卡長度 */
+            --sub-h: 60px;   /* 小卡單段長度 */
             --duration: 1.5s;
             --color-inner: #fdfcf0;
-            --color-sub: #3498db;
-            /* 紅色軸心距離大卡中摺線的位移 */
-            --anchor-dist: 60px; 
+            --color-deep-blue: #3498db;  /* 深藍分頁 */
+            --color-light-blue: #85c1e9; /* 淺藍分頁 */
+            --anchor-dist: 70px; /* 紅色軸心距離中線位置 */
         }
 
         body {
@@ -78,16 +78,17 @@
         .face.front { background: #e74c3c; transform: rotateX(180deg); }
         .face.back { background: var(--color-inner); transform-style: preserve-3d; }
 
-        /* --- 修正的核心：嵌套結構 --- */
+        /* --- 小卡同步動作結構 --- */
 
-        .sub-bottom {
+        /* 深藍分頁：固定在底頁（紅色標記軸） */
+        .sub-deep-blue {
             position: absolute;
             left: 50%;
             top: var(--anchor-dist); 
             width: var(--sub-w);
             height: var(--sub-h);
-            background: var(--color-sub);
-            /* 紅色標記軸：軸心在底部 */
+            background: var(--color-deep-blue);
+            /* 軸心在底邊（紅色標記） */
             transform-origin: bottom; 
             transform: translateX(-50%) rotateX(0deg);
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
@@ -95,30 +96,33 @@
             border: 1px solid #2980b9;
         }
 
-        .sub-top {
+        /* 淺藍分頁：初始蓋在深藍色之上，摺痕靠近鏡頭 */
+        .sub-light-blue {
             position: absolute;
-            bottom: 100%; /* 從下段頂部（紫色摺痕）開始 */
+            top: 0; /* 接合在深藍頁的頂端（紫色摺痕） */
             left: 0;
             width: 100%;
             height: var(--sub-h);
-            background: #5dade2;
-            /* 紫色標記摺痕：軸心在底邊 */
+            background: var(--color-light-blue);
+            /* 軸心在接合處（紫色標記） */
             transform-origin: bottom; 
-            transform: rotateX(0deg); 
+            /* 初始狀態：180度反折，平貼在深藍頁之上 */
+            transform: rotateX(180deg); 
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid #2980b9;
+            border: 1px solid #5499c7;
         }
 
-        /* --- 連動邏輯：強制產生 3D 階梯 --- */
+        /* --- 同步翻動邏輯 --- */
 
-        .card-top.is-open ~ .sub-bottom {
-            /* 下半部立起 90 度，完全垂直於底面 */
+        /* 1. 深藍頁與底頁夾角由 0 變為 90 度 */
+        .card-top.is-open ~ .sub-deep-blue {
             transform: translateX(-50%) rotateX(-90deg);
         }
 
-        .card-top.is-open ~ .sub-bottom .sub-top {
-            /* 上半部相對於下半部轉 -90 度，變回水平狀態並抵住掀蓋 */
-            transform: rotateX(-90deg);
+        /* 2. 淺藍頁與深藍頁夾角同步由 0 變為 90 度 */
+        /* (從原本的反摺 180度 變為 90度，等於相對轉動了 90度) */
+        .card-top.is-open ~ .sub-deep-blue .sub-light-blue {
+            transform: rotateX(90deg);
         }
 
     </style>
@@ -129,8 +133,8 @@
         <div class="card-system" onclick="document.getElementById('cardTop').classList.toggle('is-open')">
             <div class="card-bottom"></div>
             
-            <div class="sub-bottom">
-                <div class="sub-top"></div>
+            <div class="sub-deep-blue">
+                <div class="sub-light-blue"></div>
             </div>
 
             <div class="card-top" id="cardTop">
