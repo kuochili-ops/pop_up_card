@@ -3,18 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book：小摺卡立體連動修正版</title>
+    <title>Pop-up Book：階梯式平行摺疊</title>
     <style>
         :root {
             --card-w: 350px;
             --card-h: 220px;
-            /* 小卡尺寸為原大卡的 1/4 */
-            --sub-w: 87.5px; 
-            --sub-h: 60px; 
+            --sub-w: 87.5px; /* 1/4 寬度 */
+            --sub-h: 60px;   /* 單段小卡高度 */
             --duration: 1.5s;
             --color-inner: #fdfcf0;
             --color-sub: #3498db;
-            /* 固定邊(紅色標記)距離大卡中摺線的距離 */
+            /* 紅色標記軸：距離中線的位移 */
             --anchor-dist: 60px; 
         }
 
@@ -44,7 +43,6 @@
             cursor: pointer;
         }
 
-        /* 大卡底頁 */
         .card-bottom {
             position: absolute;
             top: 0;
@@ -55,7 +53,6 @@
             transform-style: preserve-3d;
         }
 
-        /* 大卡上頁 (蓋子) */
         .card-top {
             position: absolute;
             bottom: 0;
@@ -69,9 +66,7 @@
             z-index: 10;
         }
 
-        .card-top.is-open {
-            transform: rotateX(-90deg);
-        }
+        .card-top.is-open { transform: rotateX(-90deg); }
 
         .face {
             position: absolute;
@@ -83,49 +78,47 @@
         .face.front { background: #e74c3c; transform: rotateX(180deg); }
         .face.back { background: var(--color-inner); transform-style: preserve-3d; }
 
-        /* --- 核心連動結構 --- */
+        /* --- 願望核心：嵌套結構 --- */
 
-        /* 小摺卡下半頁：固定在底頁上的紅色標記軸 */
         .sub-bottom {
             position: absolute;
             left: 50%;
-            /* 紅色標記貼附位置 */
             top: var(--anchor-dist); 
             width: var(--sub-w);
             height: var(--sub-h);
             background: var(--color-sub);
-            /* 紅色標記旋轉軸心設定在底邊 */
+            /* 紅色標記軸：軸心在底部 */
             transform-origin: bottom; 
             transform: translateX(-50%) rotateX(0deg);
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
-            transform-style: preserve-3d;
+            transform-style: preserve-3d; /* 必須讓子元素也能 3D 旋轉 */
             border: 1px solid #2980b9;
         }
 
-        /* 大卡開啟時，下半頁從小卡底面向上立起 */
-        .card-top.is-open ~ .sub-bottom {
-            transform: translateX(-50%) rotateX(-90deg);
-        }
-
-        /* 小摺卡上半頁：與下半頁連在紫色標記摺痕上 */
         .sub-top {
             position: absolute;
-            /* 從下半頁頂端(紫色摺痕)延伸 */
-            bottom: 100%; 
+            bottom: 100%; /* 從下段頂部（紫色摺痕）開始 */
             left: 0;
             width: 100%;
             height: var(--sub-h);
             background: #5dade2;
-            /* 紫色標記摺痕旋轉軸心設定在底邊 */
+            /* 紫色摺痕：軸心在底部（相對於 sub-bottom 的頂邊） */
             transform-origin: bottom; 
-            /* 初始狀態與下半頁平貼摺疊 */
             transform: rotateX(0deg); 
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             border: 1px solid #2980b9;
         }
 
-        /* 大卡開啟時，上半頁相對下半頁外翻，使其末端貼在大卡蓋子內頁 */
+        /* --- 連動動態 --- */
+
+        .card-top.is-open ~ .sub-bottom {
+            /* 下半部向上立起 90 度 (垂直於底頁) */
+            transform: translateX(-50%) rotateX(-90deg);
+        }
+
         .card-top.is-open ~ .sub-bottom .sub-top {
+            /* 上半部相對於下半部轉 -90 度 (平行於底頁) */
+            /* 這樣上段的末端就會剛好抵住大卡的蓋子 */
             transform: rotateX(-90deg);
         }
 
