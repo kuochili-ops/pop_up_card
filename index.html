@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book：紫色邊連動修正版</title>
+    <title>Pop-up Book：平行摺疊連動版</title>
     <style>
         :root {
             --card-w: 350px;
@@ -14,7 +14,7 @@
             --color-inner: #fdfcf0;
             --color-sub: #3498db;
             --color-sub-alt: #5dade2;
-            /* 小卡底邊固定點距離中線的距離 */
+            /* 小卡固定邊(底邊)距離大卡中摺線的距離 */
             --anchor-offset: 80px; 
         }
 
@@ -43,6 +43,7 @@
             top: 50%;
         }
 
+        /* 大卡底頁 */
         .card-bottom {
             position: absolute;
             top: 0;
@@ -53,6 +54,7 @@
             transform-style: preserve-3d;
         }
 
+        /* 大卡上頁 (蓋子) */
         .card-top {
             position: absolute;
             bottom: 0;
@@ -80,16 +82,15 @@
         .face.front { background: #e74c3c; transform: rotateX(180deg); }
         .face.back { background: var(--color-inner); transform-style: preserve-3d; }
 
-        /* --- 小卡下半頁：軸心在底部 --- */
+        /* --- 小卡下半頁：紫色標記摺痕連點 --- */
         .sub-bottom {
             position: absolute;
             left: 50%;
-            /* 固定位置：距離中線 --anchor-offset */
+            /* 修正：將 top 設定為 offset - sub-h，確保頂端剛好到達目標位置 */
             top: var(--anchor-offset); 
             width: var(--sub-w);
             height: var(--sub-h);
             background: var(--color-sub);
-            /* 修正：軸心在下邊緣 (bottom) */
             transform-origin: bottom; 
             transform: translateX(-50%) rotateX(0deg);
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
@@ -97,20 +98,19 @@
         }
 
         .card-top.is-open ~ .sub-bottom {
-            /* 向上方轉動 90 度立起 */
+            /* 向上立起 90 度，此時頂端（紫色摺痕）會懸空在離大卡中摺線 offset 的位置 */
             transform: translateX(-50%) rotateX(-90deg);
         }
 
-        /* --- 小卡上半頁：嵌套在大卡內頁 --- */
+        /* --- 小卡上半頁：嵌套在大卡內頁，且底端與下半頁對齊 --- */
         .sub-top {
             position: absolute;
             left: 50%;
-            /* 上半頁底邊與下半頁頂邊對齊 (即摺痕處) */
-            bottom: 0; 
+            /* 修正：上半頁的底端(bottom)座標要跟下半頁立起後的位置完全重合 */
+            bottom: var(--anchor-offset); 
             width: var(--sub-w);
             height: var(--sub-h);
             background: var(--color-sub-alt);
-            /* 軸心在上邊緣 (top)，固定在大卡內頁 */
             transform-origin: top; 
             transform: translateX(-50%) rotateX(0deg); 
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
@@ -118,7 +118,7 @@
         }
 
         .card-top.is-open .sub-top {
-            /* 隨著大卡掀開，上半頁相對大卡翻轉，維持與下半頁接合 */
+            /* 隨著大卡立起，它相對大卡內頁翻轉，底端與下半頁頂端交會 */
             transform: translateX(-50%) rotateX(90deg);
         }
 
@@ -128,14 +128,18 @@
 
     <div class="scene">
         <div class="card-system" onclick="document.getElementById('cardTop').classList.toggle('is-open')">
+            
             <div class="card-bottom"></div>
+            
             <div class="sub-bottom"></div>
+
             <div class="card-top" id="cardTop">
                 <div class="face front"></div>
                 <div class="face back">
                     <div class="sub-top"></div>
                 </div>
             </div>
+
         </div>
     </div>
 
