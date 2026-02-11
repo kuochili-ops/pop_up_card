@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book：摺痕上移連動版</title>
+    <title>Pop-up Book：小卡 180度翻轉版</title>
     <style>
         :root {
             --card-w: 350px;
@@ -14,8 +14,7 @@
             --color-inner: #fdfcf0;
             --color-deep-blue: #3498db;
             --color-light-blue: #85c1e9;
-            /* 調整深藍頁掛載的高度，使其靠近大卡中摺線 */
-            --anchor-y: 110px; 
+            --anchor-y: 110px; /* 紅色軸心位置 */
         }
 
         body {
@@ -79,7 +78,7 @@
         .face.front { background: #e74c3c; transform: rotateX(180deg); }
         .face.back { background: var(--color-inner); transform-style: preserve-3d; }
 
-        /* --- 核心修正：摺痕上移結構 --- */
+        /* --- 180度翻轉結構 --- */
 
         .sub-deep-blue {
             position: absolute;
@@ -88,7 +87,7 @@
             width: var(--sub-w);
             height: var(--sub-h);
             background: var(--color-deep-blue);
-            /* 修正：軸心改在頂部，大卡翻開時，底部的摺痕會向上提 */
+            /* 紅色軸心在頂部：大卡翻開時帶動摺痕上移 */
             transform-origin: top; 
             transform: translateX(-50%) rotateX(0deg);
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
@@ -98,29 +97,32 @@
 
         .sub-light-blue {
             position: absolute;
-            /* 摺痕（紫色標記）現在在深藍頁的底邊 */
+            /* 紫色摺痕：位於深藍頁的底邊 */
             bottom: 0; 
             left: 0;
             width: 100%;
             height: var(--sub-h);
             background: var(--color-light-blue);
             transform-origin: bottom; 
-            /* 初始夾角 0 度，疊在深藍頁上且摺痕面向鏡頭 */
+            /* 初始狀態：夾角 0度 (蓋在深藍頁內側) */
             transform: rotateX(0deg); 
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             border: 1px solid #5499c7;
+            /* 確保翻轉 180 度後背面可見 */
+            backface-visibility: visible;
         }
 
-        /* --- 連動邏輯：同步提拉與展開 --- */
+        /* --- 連動邏輯：同步提拉與 180度 大翻轉 --- */
 
-        /* 1. 深藍頁隨大卡立起，摺痕邊向上移動 (0 -> 90度) */
+        /* 1. 深藍頁立起 (0 -> 90度)，摺痕向上提 */
         .card-top.is-open ~ .sub-deep-blue {
             transform: translateX(-50%) rotateX(90deg);
         }
 
-        /* 2. 淺藍頁同步向內翻轉 (0 -> 90度) */
+        /* 2. 淺藍頁同步進行 180度 翻轉 */
+        /* 它會從小卡內側翻開，越過摺痕，最終與深藍頁反向對齊 */
         .card-top.is-open ~ .sub-deep-blue .sub-light-blue {
-            transform: rotateX(90deg);
+            transform: rotateX(180deg);
         }
 
     </style>
