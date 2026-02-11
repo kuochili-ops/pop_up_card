@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book：使用者觀點修正版</title>
+    <title>Pop-up Book：使用者觀點向下微調版</title>
     <style>
         :root {
             --card-w: 350px;
@@ -65,19 +65,16 @@
             overflow: visible; 
         }
 
-        /* --- 依照你的觀點修正：基準線在接合處，往上提 --- */
+        /* --- 修正後的圖片邏輯：依照您的觀點往下一點 --- */
         .main-img-attachment {
             position: absolute; 
             left: 50%;
-            /* 1. 基準線在深藍頁與大卡下頁的接合處 (對應 top: 0) */
-            top: 0; 
+            top: 0; /* 基準線在深藍頁與大卡下頁的接合處 */
             width: var(--img-w); 
             height: var(--img-h);
             
-            /* 2. 為了「上移」（往大卡摺痕與封面方向移動） */
-            /* 在這個翻轉角度下，增加正向的 translateY 才是真正的「上移」 */
-            /* 這次我們直接往上提 40px */
-            transform: translateX(-50%) translateY(40px) rotateX(180deg) translateZ(2px);
+            /* 將 40px 改為 20px，圖片視覺上會往「下」靠近接合處 */
+            transform: translateX(-50%) translateY(20px) rotateX(180deg) translateZ(2px);
             
             pointer-events: none; 
             backface-visibility: visible;
@@ -87,7 +84,7 @@
             width: 100%; 
             height: 100%; 
             object-fit: contain; 
-            object-position: top; /* 這次將重心放在頂端，配合你的上移指令 */
+            object-position: top; 
         }
 
         .sub-light-blue {
