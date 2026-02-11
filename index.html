@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book：淺藍在上 360度翻轉版</title>
+    <title>Pop-up Book：實體摺疊連動版</title>
     <style>
         :root {
             --card-w: 350px;
@@ -14,7 +14,8 @@
             --color-inner: #fdfcf0;
             --color-deep-blue: #3498db;
             --color-light-blue: #85c1e9;
-            --anchor-y: 110px; 
+            /* 紅色軸心位置：靠近鏡頭端 */
+            --anchor-y: 150px; 
         }
 
         body {
@@ -31,7 +32,8 @@
             width: var(--card-w);
             height: var(--card-h);
             transform-style: preserve-3d;
-            transform: rotateX(25deg) rotateY(-15deg);
+            /* 調整場景角度，讓開口朝向鏡頭 */
+            transform: rotateX(45deg) rotateY(0deg);
         }
 
         .card-system {
@@ -43,6 +45,7 @@
             cursor: pointer;
         }
 
+        /* 大卡底頁 */
         .card-bottom {
             position: absolute;
             top: 0;
@@ -53,13 +56,14 @@
             transform-style: preserve-3d;
         }
 
+        /* 大卡掀蓋：開口朝向鏡頭 (軸心在中線) */
         .card-top {
             position: absolute;
-            bottom: 0;
-            top: -100%;
+            bottom: 100%; /* 從中線向上延伸 */
             width: 100%;
             height: var(--card-h);
             transform-origin: bottom;
+            /* 初始閉合狀態：蓋在底頁上 */
             transform: rotateX(-180deg);
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
@@ -78,7 +82,7 @@
         .face.front { background: #e74c3c; transform: rotateX(180deg); }
         .face.back { background: var(--color-inner); transform-style: preserve-3d; }
 
-        /* --- 核心結構：淺藍在上 --- */
+        /* --- 核心結構：摺痕朝鏡頭，淺藍在上 --- */
 
         .sub-deep-blue {
             position: absolute;
@@ -87,7 +91,8 @@
             width: var(--sub-w);
             height: var(--sub-h);
             background: var(--color-deep-blue);
-            transform-origin: top; 
+            /* 紅色軸心：在靠近鏡頭的這一側 */
+            transform-origin: bottom; 
             transform: translateX(-50%) rotateX(0deg);
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
@@ -96,31 +101,32 @@
 
         .sub-light-blue {
             position: absolute;
+            /* 紫色摺痕：位於深藍頁的底邊 (朝向鏡頭) */
             bottom: 0; 
             left: 0;
             width: 100%;
             height: var(--sub-h);
             background: var(--color-light-blue);
-            /* 以紫色摺痕(底邊)為軸心 */
             transform-origin: bottom; 
-            /* 初始狀態：rotateX(0deg) 會讓它自然位於深藍頁的上方(更靠近觀察者) */
+            /* 初始狀態：夾角 0度 (蓋在深藍頁上面) */
             transform: rotateX(0deg); 
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             border: 1px solid #5499c7;
             backface-visibility: visible;
-            /* 提高 z-index 確保初始在大卡底面上時，它是蓋在深藍頁上的 */
-            z-index: 2; 
+            z-index: 2;
         }
 
-        /* --- 連動邏輯：同步提拉與 360 度大風車 --- */
+        /* --- 連動邏輯：向上拉提與 360 度迴旋 --- */
 
+        /* 1. 深藍頁隨大卡啟動同步向上立起 */
         .card-top.is-open ~ .sub-deep-blue {
-            transform: translateX(-50%) rotateX(90deg);
+            transform: translateX(-50%) rotateX(-90deg);
         }
 
+        /* 2. 淺藍頁執行 360 度大翻轉 */
         .card-top.is-open ~ .sub-deep-blue .sub-light-blue {
-            /* 淺藍頁執行 360 度旋轉，從小卡上方騰空躍起並繞軸一圈 */
-            transform: rotateX(360deg);
+            /* 從原本貼合的位置向外、向上、翻轉一整圈 */
+            transform: rotateX(-360deg);
         }
 
     </style>
