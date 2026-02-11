@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book：階梯式立體連動（正確版）</title>
+    <title>Pop-up Book：摺痕上移連動版</title>
     <style>
         :root {
             --card-w: 350px;
@@ -14,7 +14,8 @@
             --color-inner: #fdfcf0;
             --color-deep-blue: #3498db;
             --color-light-blue: #85c1e9;
-            --anchor-dist: 70px; 
+            /* 調整深藍頁掛載的高度，使其靠近大卡中摺線 */
+            --anchor-y: 110px; 
         }
 
         body {
@@ -78,16 +79,17 @@
         .face.front { background: #e74c3c; transform: rotateX(180deg); }
         .face.back { background: var(--color-inner); transform-style: preserve-3d; }
 
-        /* --- 核心正確結構 --- */
+        /* --- 核心修正：摺痕上移結構 --- */
 
         .sub-deep-blue {
             position: absolute;
             left: 50%;
-            top: var(--anchor-dist); 
+            top: var(--anchor-y); 
             width: var(--sub-w);
             height: var(--sub-h);
             background: var(--color-deep-blue);
-            transform-origin: bottom; /* 紅色標記軸 */
+            /* 修正：軸心改在頂部，大卡翻開時，底部的摺痕會向上提 */
+            transform-origin: top; 
             transform: translateX(-50%) rotateX(0deg);
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
@@ -96,27 +98,29 @@
 
         .sub-light-blue {
             position: absolute;
-            top: 0; /* 紫色標記摺痕 */
+            /* 摺痕（紫色標記）現在在深藍頁的底邊 */
+            bottom: 0; 
             left: 0;
             width: 100%;
             height: var(--sub-h);
             background: var(--color-light-blue);
-            transform-origin: top; 
-            /* 初始狀態：夾角 0 度，蓋在深藍頁上 */
+            transform-origin: bottom; 
+            /* 初始夾角 0 度，疊在深藍頁上且摺痕面向鏡頭 */
             transform: rotateX(0deg); 
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             border: 1px solid #5499c7;
         }
 
-        /* --- 連動邏輯 --- */
+        /* --- 連動邏輯：同步提拉與展開 --- */
 
+        /* 1. 深藍頁隨大卡立起，摺痕邊向上移動 (0 -> 90度) */
         .card-top.is-open ~ .sub-deep-blue {
-            transform: translateX(-50%) rotateX(-90deg);
+            transform: translateX(-50%) rotateX(90deg);
         }
 
+        /* 2. 淺藍頁同步向內翻轉 (0 -> 90度) */
         .card-top.is-open ~ .sub-deep-blue .sub-light-blue {
-            /* 向內翻轉 90 度，形成階梯 */
-            transform: rotateX(-90deg);
+            transform: rotateX(90deg);
         }
 
     </style>
