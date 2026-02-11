@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book：物理防穿透最終版</title>
+    <title>Pop-up Book：單一大卡對齊版</title>
     <style>
         :root {
             --card-w: 350px;
@@ -16,7 +16,6 @@
             --color-pink-paper: #ffe4e1;
             --color-deep-blue-trans: rgba(52, 152, 219, 0.4);
             --color-light-blue-trans: rgba(133, 193, 233, 0.4);
-            /* 軸 A 距離大卡中線 60px */
             --anchor-a-y: 60px; 
         }
 
@@ -82,6 +81,7 @@
         .face.front { background-image: url('IMG_6829.png'); transform: rotateX(180deg); }
         .face.back { background-image: url('IMG_6831.png'); transform-style: preserve-3d; }
 
+        /* 小卡下頁 (深藍透明頁) */
         .sub-deep-blue {
             position: absolute;
             left: 50%;
@@ -97,19 +97,17 @@
             overflow: visible; 
         }
 
-        /* --- 修正：調整圖片高度與位移，防止穿透 --- */
+        /* --- 圖片上移並對齊下緣摺痕 --- */
         .main-img-attachment {
             position: absolute;
             left: 50%;
-            /* 關鍵：圖片下緣不再對齊深藍頁底端 (bottom:0)，
-               而是向上提，確保閉合時圖片底部不會超過大卡中線。
-               軸 A 到中線是 60px，所以圖片下半部黏貼長度建議為 55px */
-            bottom: 5px; 
+            /* 底部精確對齊深藍頁的最下緣 (摺痕處) */
+            bottom: 0; 
             width: var(--img-w);
             height: var(--img-h);
             
-            /* 讓圖片背面的下半部貼在深藍頁外側，面對鏡頭 */
-            transform: translateX(-50%) rotateX(180deg) translateZ(1px);
+            /* 正面向鏡頭，並貼在深藍頁的前方 */
+            transform: translateX(-50%) rotateX(180deg) translateZ(2px);
             pointer-events: none;
             backface-visibility: visible;
         }
@@ -118,7 +116,6 @@
             width: 100%;
             height: 100%;
             object-fit: contain;
-            /* 確保狗狗在容器內是底部對齊，增加黏貼感 */
             object-position: bottom;
         }
 
@@ -135,6 +132,7 @@
             border: 1px solid rgba(84, 153, 199, 0.3);
         }
 
+        /* 連動效果 */
         .is-open ~ .sub-deep-blue { transform: translateX(-50%) rotateX(90deg); }
         .is-open ~ .sub-deep-blue .sub-light-blue { transform: rotateX(90deg); }
 
