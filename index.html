@@ -2,16 +2,16 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book：使用者觀點再次下調版</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pop-up Book：手機優化版</title>
     <style>
         :root {
-            --card-w: 350px;
-            --card-h: 220px;
-            --sub-w: 87.5px;
-            --sub-h: 60px;
-            --img-w: 160px; 
-            --img-h: 110px;
+            --card-w: 300px; /* 手機版略調小一點 */
+            --card-h: 190px;
+            --sub-w: 80px;
+            --sub-h: 55px;
+            --img-w: 140px; 
+            --img-h: 100px;
             --duration: 1.5s;
             --color-pink-paper: #ffe4e1;
             --color-deep-blue-trans: rgba(52, 152, 219, 0.4);
@@ -22,12 +22,14 @@
         body {
             display: flex; justify-content: center; align-items: center;
             height: 100vh; background-color: #1a1a1a; margin: 0;
-            perspective: 2500px; overflow: hidden; user-select: none;
+            perspective: 2500px; overflow: hidden; 
+            touch-action: none; /* 禁用瀏覽器預設滑動，專注於 3D 操作 */
         }
 
         .viewport {
             width: var(--card-w); height: var(--card-h);
-            transform-style: preserve-3d; transform: rotateX(30deg) rotateY(-30deg);
+            transform-style: preserve-3d;
+            transform: rotateX(30deg) rotateY(-30deg) scale(0.8); /* 預設略微縮小 */
             cursor: grab;
         }
 
@@ -62,27 +64,17 @@
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
             border: 1px solid rgba(41, 128, 185, 0.3);
-            overflow: visible; 
         }
 
-        /* --- 再次下調：將 translateY 縮小到 5px --- */
         .main-img-attachment {
-            position: absolute; 
-            left: 50%;
-            top: 0; 
-            width: var(--img-w); 
-            height: var(--img-h);
-            /* 從 20px 降至 5px，圖片視覺上會更靠近接合處 */
-            transform: translateX(-50%) translateY(5px) rotateX(180deg) translateZ(2px);
-            pointer-events: none; 
-            backface-visibility: visible;
+            position: absolute; left: 50%; top: 0; 
+            width: var(--img-w); height: var(--img-h);
+            transform: translateX(-50%) translateY(0px) rotateX(180deg) translateZ(2px);
+            pointer-events: none; backface-visibility: visible;
         }
 
         .main-img-attachment img {
-            width: 100%; 
-            height: 100%; 
-            object-fit: contain; 
-            object-position: top; 
+            width: 100%; height: 100%; object-fit: contain; object-position: top; 
         }
 
         .sub-light-blue {
@@ -95,6 +87,11 @@
         .is-open ~ .sub-deep-blue { transform: translateX(-50%) rotateX(90deg); }
         .is-open ~ .sub-deep-blue .sub-light-blue { transform: rotateX(90deg); }
 
+        /* 操作提示 */
+        .hint {
+            position: fixed; bottom: 20px; color: rgba(255,255,255,0.5);
+            font-size: 12px; pointer-events: none;
+        }
     </style>
 </head>
 <body>
@@ -114,24 +111,83 @@
             </div>
         </div>
     </div>
+    <div class="hint">單指旋轉 | 雙指縮放 | 輕點開關</div>
 
     <script>
         const viewport = document.getElementById('viewport');
         const cover = document.getElementById('cover');
-        let isDragging = false, startX, startY, rotX = 30, rotY = -30;
+        
+        let rotX = 30, rotY = -30, scale = 0.8;
+        let lastTouchX = 0, lastTouchY = 0, lastDist = 0;
+        let isMoving = false;
+
+        // --- 核心縮放與旋轉邏輯 ---
+        function updateTransform() {
+            viewport.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) scale(${scale})`;
+        }
+
+        // 監聽單指與雙指操作
+        window.addEventListener('touchstart', (e) => {
+            isMoving = false;
+            if (e.touches.length === 1) {
+                lastTouchX = e.touches[0].pageX;
+                lastTouchY = e.touches[0].pageY;
+            } else if (e.touches.length === 2) {
+                lastDist = Math.hypot(
+                    e.touches[0].pageX - e.touches[1].pageX,
+                    e.touches[0].pageY - e.touches[1].pageY
+                );
+            }
+        }, { passive: false });
+
+        window.addEventListener('touchmove', (e) => {
+            e.preventDefault(); // 阻止頁面捲動
+            isMoving = true;
+
+            if (e.touches.length === 1) {
+                // 單指旋轉
+                let deltaX = e.touches[0].pageX - lastTouchX;
+                let deltaY = e.touches[0].pageY - lastTouchY;
+                rotY += deltaX * 0.5;
+                rotX -= deltaY * 0.5;
+                lastTouchX = e.touches[0].pageX;
+                lastTouchY = e.touches[0].pageY;
+            } else if (e.touches.length === 2) {
+                // 雙指縮放
+                let dist = Math.hypot(
+                    e.touches[0].pageX - e.touches[1].pageX,
+                    e.touches[0].pageY - e.touches[1].pageY
+                );
+                let deltaDist = dist - lastDist;
+                scale = Math.min(Math.max(scale + deltaDist * 0.005, 0.3), 2);
+                lastDist = dist;
+            }
+            updateTransform();
+        }, { passive: false });
+
+        // 點擊事件 (區分點擊與滑動)
+        window.addEventListener('touchend', (e) => {
+            if (!isMoving) {
+                // 如果沒有滑動，則判定為點擊，開關卡片
+                cover.classList.toggle('is-open');
+            }
+        });
+
+        // 保留電腦滑鼠操作 (相容性)
+        let isDragging = false, startX, startY;
         window.addEventListener('mousedown', (e) => { isDragging = true; startX = e.pageX; startY = e.pageY; });
         window.addEventListener('mousemove', (e) => {
             if (!isDragging) return;
             rotY += (e.pageX - startX) * 0.5; rotX -= (e.pageY - startY) * 0.5;
-            viewport.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+            updateTransform();
             startX = e.pageX; startY = e.pageY;
         });
         window.addEventListener('mouseup', () => isDragging = false);
-        let clickStart;
-        viewport.addEventListener('mousedown', () => clickStart = Date.now());
-        viewport.addEventListener('mouseup', () => {
-            if (Date.now() - clickStart < 200) cover.classList.toggle('is-open');
+        window.addEventListener('wheel', (e) => {
+            scale = Math.min(Math.max(scale - e.deltaY * 0.001, 0.3), 2);
+            updateTransform();
         });
+
     </script>
 </body>
 </html>
