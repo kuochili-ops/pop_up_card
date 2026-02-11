@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book：小卡透明貼圖版</title>
+    <title>Pop-up Book：小卡底部對齊版</title>
     <style>
         :root {
             --card-w: 350px;
@@ -12,7 +12,6 @@
             --sub-h: 60px;
             --duration: 1.5s;
             --color-inner: #fdfcf0;
-            /* 小卡改為透明材質 */
             --color-deep-blue-trans: rgba(52, 152, 219, 0.4);
             --color-light-blue-trans: rgba(133, 193, 233, 0.4);
             --anchor-a-y: 60px; 
@@ -90,7 +89,7 @@
             transform-style: preserve-3d;
         }
 
-        /* --- 修正：透明小卡與背部貼圖 --- */
+        /* --- 修正：圖片下緣對齊 --- */
 
         .sub-deep-blue {
             position: absolute;
@@ -98,7 +97,6 @@
             top: var(--anchor-a-y); 
             width: var(--sub-w);
             height: var(--sub-h);
-            /* 透明背景 */
             background: var(--color-deep-blue-trans);
             transform-origin: top; 
             transform: translateX(-50%) rotateX(0deg);
@@ -107,15 +105,19 @@
             border: 1px solid rgba(41, 128, 185, 0.5);
         }
 
-        /* 深藍頁外側貼圖 IMG_6832.jpg */
+        /* 深藍頁外側貼圖 - 底部對齊 */
         .sub-deep-blue::before {
             content: '';
             position: absolute;
             width: 100%;
-            height: 100%;
+            /* 如果圖片很大，可以讓高度溢出，或者設為 100% 並靠底 */
+            height: 100%; 
             background-image: url('IMG_6832.jpg');
-            background-size: cover;
-            /* 翻轉到背面 */
+            /* 關鍵：圖片寬度填滿，高度自動，且對齊底部 */
+            background-size: contain; 
+            background-repeat: no-repeat;
+            background-position: bottom; 
+            /* 翻轉到背面（外側） */
             transform: rotateX(180deg);
             backface-visibility: visible;
         }
@@ -126,7 +128,6 @@
             left: 0;
             width: 100%;
             height: var(--sub-h);
-            /* 透明背景 */
             background: var(--color-light-blue-trans);
             transform-origin: top; 
             transform: rotateX(180deg) translateZ(2px); 
@@ -138,20 +139,9 @@
         .is-open ~ .sub-deep-blue { transform: translateX(-50%) rotateX(90deg); }
         .is-open ~ .sub-deep-blue .sub-light-blue { transform: rotateX(90deg) translateZ(2px); }
 
-        .instruction {
-            position: absolute;
-            bottom: 20px;
-            color: #888;
-            font-family: sans-serif;
-            text-align: center;
-            width: 100%;
-            pointer-events: none;
-        }
     </style>
 </head>
 <body>
-
-    <div class="instruction">拖曳旋轉視角觀察小卡外側貼圖 | 點擊開合</div>
 
     <div class="viewport" id="viewport">
         <div class="card-system">
