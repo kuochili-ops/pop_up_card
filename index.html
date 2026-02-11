@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book：圖片精確上移版</title>
+    <title>Pop-up Book：上緣接合處基準版</title>
     <style>
         :root {
             --card-w: 350px;
@@ -66,15 +66,17 @@
             overflow: visible; 
         }
 
-        /* --- 圖片上移：減少 translateY 數值 --- */
+        /* --- 核心修正：基準點在深藍頁與大卡接合處 (頂端) --- */
         .main-img-attachment {
             position: absolute; 
             left: 50%;
-            bottom: 100%; /* 物理基準固定在小卡頂部摺痕 */
+            /* top: 0 讓圖片底部錨定在深藍頁的起始接合處 */
+            top: 0; 
             width: var(--img-w); 
             height: var(--img-h);
-            /* 從 85px 改為 65px，圖片整體向上提 20px */
-            transform: translateX(-50%) translateY(65px) rotateX(180deg) translateZ(2px);
+            /* translateY(-100%) 將圖片完全移到接合處上方 */
+            /* 這樣開啟時狗狗會懸浮在空中，閉合時絕對不會穿透底頁 */
+            transform: translateX(-50%) translateY(-100%) rotateX(180deg) translateZ(2px);
             pointer-events: none; 
             backface-visibility: visible;
         }
@@ -83,6 +85,7 @@
             width: 100%; 
             height: 100%; 
             object-fit: contain; 
+            /* 內容靠底部顯示，讓腳踩在基準線上 */
             object-position: bottom; 
         }
 
