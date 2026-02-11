@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book：幾何防穿透版</title>
+    <title>Pop-up Book：圖片上移對齊版</title>
     <style>
         :root {
             --card-w: 350px;
@@ -66,19 +66,26 @@
             overflow: visible; 
         }
 
-        /* --- 核心修正：將圖片貼附於深藍頁，且下緣對齊底端摺痕 --- */
+        /* --- 核心修正：圖上移，bottom: 0 精確對齊下緣 --- */
         .main-img-attachment {
-            position: absolute; left: 50%;
-            /* 底部精確對齊深藍頁底邊摺痕 */
+            position: absolute; 
+            left: 50%;
+            /* 將圖片下移量取消，改為 bottom: 0 確保對齊摺痕 */
             bottom: 0; 
-            width: var(--img-w); height: var(--img-h);
-            /* 旋轉 180 度正對鏡頭，translateZ 確保在小卡前方 */
-            transform: translateX(-50%) rotateX(180deg) translateZ(1px);
-            pointer-events: none; backface-visibility: visible;
+            width: var(--img-w); 
+            height: var(--img-h);
+            /* 旋轉 180 度正對鏡頭，translateZ 確保貼在深藍頁外側面 */
+            transform: translateX(-50%) rotateX(180deg) translateZ(2px);
+            pointer-events: none; 
+            backface-visibility: visible;
         }
 
         .main-img-attachment img {
-            width: 100%; height: 100%; object-fit: contain; object-position: bottom;
+            width: 100%; 
+            height: 100%; 
+            object-fit: contain; 
+            /* 讓內容在容器中靠下顯示 */
+            object-position: bottom; 
         }
 
         .sub-light-blue {
