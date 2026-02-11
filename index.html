@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book：淺藍在上 (180度翻轉版)</title>
+    <title>Pop-up Book：小卡 90度同步張開版</title>
     <style>
         :root {
             --card-w: 350px;
@@ -12,9 +12,8 @@
             --sub-h: 60px;
             --duration: 1.5s;
             --color-inner: #fdfcf0;
-            /* 使用透明度確保觀察順序 */
             --color-deep-blue: rgba(52, 152, 219, 0.95);
-            --color-light-blue: rgba(133, 193, 233, 1); 
+            --color-light-blue: rgba(133, 193, 233, 1);
             --anchor-a-y: 60px; 
         }
 
@@ -80,7 +79,7 @@
         .face.front { background: rgba(231, 76, 60, 0.05); transform: rotateX(180deg); }
         .face.back { background: rgba(253, 252, 240, 0.1); transform-style: preserve-3d; }
 
-        /* --- 修正的核心：小卡運動鏈 --- */
+        /* --- 核心結構：90度同步連動 --- */
 
         .sub-deep-blue {
             position: absolute;
@@ -98,33 +97,32 @@
 
         .sub-light-blue {
             position: absolute;
-            /* 摺痕（軸 B）：位於深藍頁底端（朝向鏡頭） */
+            /* 摺痕（軸 B）：位於深藍頁底端 */
             top: 100%; 
             left: 0;
             width: 100%;
             height: var(--sub-h);
             background: var(--color-light-blue);
             transform-origin: top; 
-            /* 【核心修正】 */
-            /* 1. 使用正 180 度讓它向「前方」翻摺，這樣就會蓋在深藍頁上面 */
-            /* 2. translateZ(5px) 物理性推向鏡頭，解決截圖中深藍在上的問題 */
-            transform: rotateX(180deg) translateZ(5px); 
+            /* 起始狀態：夾角 0 度，蓋在深藍頁上方 */
+            /* 使用 rotateX(180deg) 摺回，translateZ 確保層次 */
+            transform: rotateX(180deg) translateZ(2px); 
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             border: 1px solid #5499c7;
             backface-visibility: visible;
         }
 
-        /* --- 連動邏輯：同步展開 180 度 --- */
+        /* --- 連動邏輯：夾角同步增加至 90 度 --- */
 
-        /* 1. 深藍頁立起 90 度 */
+        /* 1. 深藍頁與底頁夾角增加至 90 度 */
         .card-top.is-open ~ .sub-deep-blue {
             transform: translateX(-50%) rotateX(90deg);
         }
 
-        /* 2. 淺藍頁執行 180 度轉動（從 180 回到 0） */
-        /* 視覺效果：從小卡上方掀開，轉動 180 度後平攤，摺痕始終朝鏡頭 */
+        /* 2. 淺藍頁與深藍頁夾角增加至 90 度 */
+        /* 從起始的 180度(重疊) 轉動到 90度(垂直) */
         .card-top.is-open ~ .sub-deep-blue .sub-light-blue {
-            transform: rotateX(0deg) translateZ(5px); 
+            transform: rotateX(90deg) translateZ(2px); 
         }
 
     </style>
