@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book：主圖對齊小卡下頁版</title>
+    <title>Pop-up Book：圖片貼附小卡版</title>
     <style>
         :root {
             --card-w: 350px;
             --card-h: 220px;
             --sub-w: 87.5px;
             --sub-h: 60px;
-            --img-limit-w: 140px; 
-            --img-limit-h: 95px;
+            --img-w: 160px; /* 依照您的要求保持較大的尺寸 */
+            --img-h: 110px;
             --duration: 1.5s;
             --color-inner: #fdfcf0;
             --color-pink-paper: #ffe4e1;
@@ -82,7 +82,7 @@
         .face.front { background-image: url('IMG_6829.png'); transform: rotateX(180deg); }
         .face.back { background-image: url('IMG_6831.png'); transform-style: preserve-3d; }
 
-        /* 小卡下頁 (深藍透明頁) */
+        /* --- 小卡下頁 (深藍透明頁) --- */
         .sub-deep-blue {
             position: absolute;
             left: 50%;
@@ -95,29 +95,32 @@
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
             border: 1px solid rgba(41, 128, 185, 0.3);
+            /* 必須允許子元素溢出，因為圖片比深藍頁大 */
             overflow: visible; 
         }
 
-        /* --- 主圖修正：貼齊小卡下頁的下緣 --- */
-        .main-img-stand {
+        /* --- 修正：圖片貼附在深藍頁外側面 --- */
+        .main-img-attachment {
             position: absolute;
             left: 50%;
-            /* 關鍵：top: 100% 確保圖片底邊對齊小卡下頁的底邊 */
-            top: 100%;
-            width: var(--img-limit-w);
-            height: var(--img-limit-h);
-            /* 軸心設在圖片頂部（剛好是與下頁連接處） */
-            transform-origin: top;
-            /* 轉向正面並推前 1px */
-            transform: translateX(-50%) rotateX(-90deg) translateZ(1px);
-            transform-style: preserve-3d;
+            /* 關鍵定位：
+               bottom: 0 使圖片下緣與深藍頁對齊，
+               但為了讓「下半部」貼附，我們維持 bottom: 0 並讓高度自然向上延伸 */
+            bottom: 0;
+            width: var(--img-w);
+            height: var(--img-h);
+            
+            /* 旋轉 180 度正對用戶，並向外推 1px 避免 z-fighting 閃爍 */
+            transform: translateX(-50%) rotateX(180deg) translateZ(1px);
+            
+            pointer-events: none;
+            backface-visibility: visible;
         }
 
-        .main-img-stand img {
+        .main-img-attachment img {
             width: 100%;
             height: 100%;
             object-fit: contain;
-            /* 圖片內容在容器內向下靠攏 */
             object-position: bottom;
         }
 
@@ -134,6 +137,7 @@
             border: 1px solid rgba(84, 153, 199, 0.3);
         }
 
+        /* 小卡連動 */
         .is-open ~ .sub-deep-blue { transform: translateX(-50%) rotateX(90deg); }
         .is-open ~ .sub-deep-blue .sub-light-blue { transform: rotateX(90deg); }
 
@@ -151,7 +155,7 @@
             </div>
 
             <div class="sub-deep-blue">
-                <div class="main-img-stand">
+                <div class="main-img-attachment">
                     <img src="IMG_6832.jpg" alt="主圖">
                 </div>
                 <div class="sub-light-blue"></div>
