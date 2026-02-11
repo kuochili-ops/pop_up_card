@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book：懸掛貼附防穿透版</title>
+    <title>Pop-up Book：幾何防穿透版</title>
     <style>
         :root {
             --card-w: 350px;
@@ -16,80 +16,49 @@
             --color-pink-paper: #ffe4e1;
             --color-deep-blue-trans: rgba(52, 152, 219, 0.4);
             --color-light-blue-trans: rgba(133, 193, 233, 0.4);
-            /* 軸 A 距離大卡中線的高度 */
             --anchor-a-y: 60px; 
         }
 
         body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #1a1a1a;
-            margin: 0;
-            perspective: 2500px;
-            overflow: hidden;
-            user-select: none;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; background-color: #1a1a1a; margin: 0;
+            perspective: 2500px; overflow: hidden; user-select: none;
         }
 
         .viewport {
-            width: var(--card-w);
-            height: var(--card-h);
-            transform-style: preserve-3d;
-            transform: rotateX(30deg) rotateY(-30deg);
+            width: var(--card-w); height: var(--card-h);
+            transform-style: preserve-3d; transform: rotateX(30deg) rotateY(-30deg);
             cursor: grab;
         }
 
-        .card-system {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            transform-style: preserve-3d;
-        }
+        .card-system { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; }
 
         .card-bottom {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: var(--color-pink-paper);
-            border: 1px solid #f5c6cb;
+            position: absolute; width: 100%; height: 100%;
+            background: var(--color-pink-paper); border: 1px solid #f5c6cb;
             transform-style: preserve-3d;
         }
 
         .card-top {
-            position: absolute;
-            bottom: 0;
-            top: -100%;
-            width: 100%;
-            height: 100%;
-            transform-origin: bottom;
-            transform: rotateX(-180deg);
+            position: absolute; bottom: 0; top: -100%; width: 100%; height: 100%;
+            transform-origin: bottom; transform: rotateX(-180deg);
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
-            transform-style: preserve-3d;
-            z-index: 10;
+            transform-style: preserve-3d; z-index: 10;
         }
-
         .card-top.is-open { transform: rotateX(-90deg); }
 
         .face {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
-            background-size: cover;
-            background-position: center;
+            position: absolute; width: 100%; height: 100%;
+            backface-visibility: hidden; background-size: cover; background-position: center;
         }
         .face.front { background-image: url('IMG_6829.png'); transform: rotateX(180deg); }
         .face.back { background-image: url('IMG_6831.png'); transform-style: preserve-3d; }
 
+        /* 小卡下頁 (深藍透明頁) */
         .sub-deep-blue {
-            position: absolute;
-            left: 50%;
-            top: var(--anchor-a-y); 
-            width: var(--sub-w);
-            height: var(--sub-h);
-            background: var(--color-deep-blue-trans);
-            transform-origin: top; 
+            position: absolute; left: 50%; top: var(--anchor-a-y); 
+            width: var(--sub-w); height: var(--sub-h);
+            background: var(--color-deep-blue-trans); transform-origin: top; 
             transform: translateX(-50%) rotateX(0deg);
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
@@ -97,38 +66,24 @@
             overflow: visible; 
         }
 
-        /* --- 核心修正：圖片下緣對齊深藍頁的上緣 --- */
+        /* --- 核心修正：將圖片貼附於深藍頁，且下緣對齊底端摺痕 --- */
         .main-img-attachment {
-            position: absolute;
-            left: 50%;
-            /* 修正：將圖片底部對齊深藍頁的頂部(摺痕處) */
-            bottom: 100%; 
-            width: var(--img-w);
-            height: var(--img-h);
-            
-            /* 稍微往下平移，讓圖片的下半部依然能「貼」在深藍頁的表面上 */
-            /* translateY(50px) 讓它往下蓋住深藍頁 */
-            transform: translateX(-50%) translateY(50px) rotateX(180deg) translateZ(2px);
-            
-            pointer-events: none;
-            backface-visibility: visible;
+            position: absolute; left: 50%;
+            /* 底部精確對齊深藍頁底邊摺痕 */
+            bottom: 0; 
+            width: var(--img-w); height: var(--img-h);
+            /* 旋轉 180 度正對鏡頭，translateZ 確保在小卡前方 */
+            transform: translateX(-50%) rotateX(180deg) translateZ(1px);
+            pointer-events: none; backface-visibility: visible;
         }
 
         .main-img-attachment img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            object-position: bottom;
+            width: 100%; height: 100%; object-fit: contain; object-position: bottom;
         }
 
         .sub-light-blue {
-            position: absolute;
-            top: 100%; 
-            left: 0;
-            width: 100%;
-            height: var(--sub-h);
-            background: var(--color-light-blue-trans);
-            transform-origin: top; 
+            position: absolute; top: 100%; left: 0; width: 100%; height: var(--sub-h);
+            background: var(--color-light-blue-trans); transform-origin: top; 
             transform: rotateX(180deg); 
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             border: 1px solid rgba(84, 153, 199, 0.3);
@@ -140,11 +95,9 @@
     </style>
 </head>
 <body>
-
     <div class="viewport" id="viewport">
         <div class="card-system">
             <div class="card-bottom"></div>
-            
             <div class="card-top" id="cover">
                 <div class="face front"></div>
                 <div class="face back"></div>
