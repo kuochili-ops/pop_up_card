@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book：淺藍在上正確連動版</title>
+    <title>Pop-up Book：淺藍在上 (180度翻轉版)</title>
     <style>
         :root {
             --card-w: 350px;
@@ -12,9 +12,10 @@
             --sub-h: 60px;
             --duration: 1.5s;
             --color-inner: #fdfcf0;
+            /* 使用透明度確保觀察順序 */
             --color-deep-blue: rgba(52, 152, 219, 0.95);
-            --color-light-blue: rgba(133, 193, 233, 0.95);
-            --anchor-a-y: 60px; /* 深藍頁與大卡接合處 */
+            --color-light-blue: rgba(133, 193, 233, 1); 
+            --anchor-a-y: 60px; 
         }
 
         body {
@@ -74,10 +75,10 @@
             width: 100%;
             height: 100%;
             backface-visibility: hidden;
-            border: 2px dashed rgba(231, 76, 60, 0.5);
+            border: 2px dashed rgba(231, 76, 60, 0.4);
         }
-        .face.front { background: rgba(231, 76, 60, 0.1); transform: rotateX(180deg); }
-        .face.back { background: rgba(253, 252, 240, 0.2); transform-style: preserve-3d; }
+        .face.front { background: rgba(231, 76, 60, 0.05); transform: rotateX(180deg); }
+        .face.back { background: rgba(253, 252, 240, 0.1); transform-style: preserve-3d; }
 
         /* --- 修正的核心：小卡運動鏈 --- */
 
@@ -88,9 +89,7 @@
             width: var(--sub-w);
             height: var(--sub-h);
             background: var(--color-deep-blue);
-            /* 軸 A：固定在底面 */
             transform-origin: top; 
-            /* 初始：貼附底面 */
             transform: translateX(-50%) rotateX(0deg);
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
@@ -106,25 +105,26 @@
             height: var(--sub-h);
             background: var(--color-light-blue);
             transform-origin: top; 
-            /* 關鍵修正：從小卡「背部」翻轉 180 度蓋在深藍頁上方 */
-            /* 使用 translateZ(2px) 強制淺藍在深藍之上 */
-            transform: rotateX(-180deg) translateZ(2px); 
+            /* 【核心修正】 */
+            /* 1. 使用正 180 度讓它向「前方」翻摺，這樣就會蓋在深藍頁上面 */
+            /* 2. translateZ(5px) 物理性推向鏡頭，解決截圖中深藍在上的問題 */
+            transform: rotateX(180deg) translateZ(5px); 
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             border: 1px solid #5499c7;
             backface-visibility: visible;
         }
 
-        /* --- 同步連動 --- */
+        /* --- 連動邏輯：同步展開 180 度 --- */
 
         /* 1. 深藍頁立起 90 度 */
         .card-top.is-open ~ .sub-deep-blue {
             transform: translateX(-50%) rotateX(90deg);
         }
 
-        /* 2. 淺藍頁從小卡上方翻開（從 -180 度回到 0 度） */
-        /* 這會形成深藍立起、淺藍平伸的階梯狀 */
+        /* 2. 淺藍頁執行 180 度轉動（從 180 回到 0） */
+        /* 視覺效果：從小卡上方掀開，轉動 180 度後平攤，摺痕始終朝鏡頭 */
         .card-top.is-open ~ .sub-deep-blue .sub-light-blue {
-            transform: rotateX(0deg) translateZ(2px); 
+            transform: rotateX(0deg) translateZ(5px); 
         }
 
     </style>
