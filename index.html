@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book：物理不穿透最終版</title>
+    <title>Pop-up Book：圖片上下邊緣校正版</title>
     <style>
         :root {
             --card-w: 350px;
             --card-h: 220px;
             --sub-w: 87.5px;
             --sub-h: 60px;
-            --img-limit-w: 116px; /* 大卡 1/3 */
+            --img-limit-w: 116px; 
             --img-limit-h: 73px;
             --duration: 1.5s;
             --color-inner: #fdfcf0;
@@ -81,17 +81,16 @@
         .face.front { background-image: url('IMG_6829.png'); transform: rotateX(180deg); }
         .face.back { background-image: url('IMG_6831.png'); transform-style: preserve-3d; }
 
-        /* --- 主圖：獨立旋轉軸心，確保不穿透底頁 --- */
+        /* --- 主圖修正：確保圖片真正的「下緣」貼在摺痕上 --- */
         .main-stand-img {
             position: absolute;
             left: 50%;
-            /* 將軸心定在小卡下頁的底端 (摺痕位置) */
-            top: calc(var(--anchor-a-y) + var(--sub-h));
+            /* 軸心在大卡中心線上 */
+            top: 0px; 
             width: var(--img-limit-w);
             height: var(--img-limit-h);
-            /* 以底部為旋轉中心 */
             transform-origin: bottom;
-            /* 初始：翻折 180 度平貼在底頁（且不穿透） */
+            /* 初始狀態：平躺在底面。注意：移除內部的 rotate，改由容器決定方向 */
             transform: translateX(-50%) rotateX(180deg);
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
@@ -102,17 +101,18 @@
             width: 100%;
             height: 100%;
             object-fit: contain;
+            /* 重要：現在圖片正常呈現，其真正的下緣會貼在大卡摺痕上 */
             object-position: bottom;
-            /* 修正圖片方向，讓它立起來時是正的 */
-            transform: rotateX(180deg); 
+            /* 移除原本錯誤的 rotateX(180deg) */
+            transform: none; 
         }
 
-        /* 當卡片開啟時，主圖立起 90 度 */
+        /* 開啟時：立起至垂直位置 */
         .is-open ~ .main-stand-img {
-            transform: translateX(-50%) rotateX(90deg);
+            transform: translateX(-50%) rotateX(270deg); /* 轉到垂直角度 */
         }
 
-        /* --- 小卡結構 --- */
+        /* --- 小卡結構維持 --- */
         .sub-deep-blue {
             position: absolute;
             left: 50%;
