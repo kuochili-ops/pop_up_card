@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book：淺藍頁 360度大翻轉</title>
+    <title>Pop-up Book：淺藍在上 360度翻轉版</title>
     <style>
         :root {
             --card-w: 350px;
             --card-h: 220px;
             --sub-w: 87.5px;
             --sub-h: 60px;
-            --duration: 1.8s; /* 稍微增加時間讓 360度更清晰 */
+            --duration: 1.8s;
             --color-inner: #fdfcf0;
             --color-deep-blue: #3498db;
             --color-light-blue: #85c1e9;
@@ -78,7 +78,7 @@
         .face.front { background: #e74c3c; transform: rotateX(180deg); }
         .face.back { background: var(--color-inner); transform-style: preserve-3d; }
 
-        /* --- 360度翻轉結構 --- */
+        /* --- 核心結構：淺藍在上 --- */
 
         .sub-deep-blue {
             position: absolute;
@@ -87,7 +87,6 @@
             width: var(--sub-w);
             height: var(--sub-h);
             background: var(--color-deep-blue);
-            /* 紅色軸心在頂部：摺痕會向上提 */
             transform-origin: top; 
             transform: translateX(-50%) rotateX(0deg);
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
@@ -97,32 +96,30 @@
 
         .sub-light-blue {
             position: absolute;
-            /* 紫色摺痕：位於深藍頁底邊 */
             bottom: 0; 
             left: 0;
             width: 100%;
             height: var(--sub-h);
             background: var(--color-light-blue);
+            /* 以紫色摺痕(底邊)為軸心 */
             transform-origin: bottom; 
-            /* 初始狀態：夾角 0度 (蓋在深藍頁上) */
+            /* 初始狀態：rotateX(0deg) 會讓它自然位於深藍頁的上方(更靠近觀察者) */
             transform: rotateX(0deg); 
-            transition: transform var(--duration) cubic-bezier(0.4, 0.2, 0.2, 1);
+            transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             border: 1px solid #5499c7;
-            /* 確保 360度旋轉中正反面皆清晰 */
             backface-visibility: visible;
+            /* 提高 z-index 確保初始在大卡底面上時，它是蓋在深藍頁上的 */
+            z-index: 2; 
         }
 
-        /* --- 同步啟動連動邏輯 --- */
+        /* --- 連動邏輯：同步提拉與 360 度大風車 --- */
 
-        /* 1. 深藍頁立起 90度，摺痕上移 */
         .card-top.is-open ~ .sub-deep-blue {
             transform: translateX(-50%) rotateX(90deg);
         }
 
-        /* 2. 淺藍頁執行 360度 大風車旋轉 */
-        /* 它會繞著摺痕旋轉一整圈，最終回到與深藍頁成 90度階梯(相對於初始點是 360+90 度) */
-        /* 為了展現「先翻轉 360度」，我們設定其目標角度 */
         .card-top.is-open ~ .sub-deep-blue .sub-light-blue {
+            /* 淺藍頁執行 360 度旋轉，從小卡上方騰空躍起並繞軸一圈 */
             transform: rotateX(360deg);
         }
 
