@@ -1,6 +1,187 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+<head><!DOCTYPE html>
+<html lang="zh-TW">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pop-up Book：物理防穿透最終版</title>
+    <style>
+        :root {
+            --card-w: 350px;
+            --card-h: 220px;
+            --sub-w: 87.5px;
+            --sub-h: 60px;
+            --img-w: 160px; 
+            --img-h: 110px;
+            --duration: 1.5s;
+            --color-pink-paper: #ffe4e1;
+            --color-deep-blue-trans: rgba(52, 152, 219, 0.4);
+            --color-light-blue-trans: rgba(133, 193, 233, 0.4);
+            /* 軸 A 距離大卡中線 60px */
+            --anchor-a-y: 60px; 
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #1a1a1a;
+            margin: 0;
+            perspective: 2500px;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .viewport {
+            width: var(--card-w);
+            height: var(--card-h);
+            transform-style: preserve-3d;
+            transform: rotateX(30deg) rotateY(-30deg);
+            cursor: grab;
+        }
+
+        .card-system {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+        }
+
+        .card-bottom {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: var(--color-pink-paper);
+            border: 1px solid #f5c6cb;
+            transform-style: preserve-3d;
+        }
+
+        .card-top {
+            position: absolute;
+            bottom: 0;
+            top: -100%;
+            width: 100%;
+            height: 100%;
+            transform-origin: bottom;
+            transform: rotateX(-180deg);
+            transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+            z-index: 10;
+        }
+
+        .card-top.is-open { transform: rotateX(-90deg); }
+
+        .face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            background-size: cover;
+            background-position: center;
+        }
+        .face.front { background-image: url('IMG_6829.png'); transform: rotateX(180deg); }
+        .face.back { background-image: url('IMG_6831.png'); transform-style: preserve-3d; }
+
+        .sub-deep-blue {
+            position: absolute;
+            left: 50%;
+            top: var(--anchor-a-y); 
+            width: var(--sub-w);
+            height: var(--sub-h);
+            background: var(--color-deep-blue-trans);
+            transform-origin: top; 
+            transform: translateX(-50%) rotateX(0deg);
+            transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+            border: 1px solid rgba(41, 128, 185, 0.3);
+            overflow: visible; 
+        }
+
+        /* --- 修正：調整圖片高度與位移，防止穿透 --- */
+        .main-img-attachment {
+            position: absolute;
+            left: 50%;
+            /* 關鍵：圖片下緣不再對齊深藍頁底端 (bottom:0)，
+               而是向上提，確保閉合時圖片底部不會超過大卡中線。
+               軸 A 到中線是 60px，所以圖片下半部黏貼長度建議為 55px */
+            bottom: 5px; 
+            width: var(--img-w);
+            height: var(--img-h);
+            
+            /* 讓圖片背面的下半部貼在深藍頁外側，面對鏡頭 */
+            transform: translateX(-50%) rotateX(180deg) translateZ(1px);
+            pointer-events: none;
+            backface-visibility: visible;
+        }
+
+        .main-img-attachment img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            /* 確保狗狗在容器內是底部對齊，增加黏貼感 */
+            object-position: bottom;
+        }
+
+        .sub-light-blue {
+            position: absolute;
+            top: 100%; 
+            left: 0;
+            width: 100%;
+            height: var(--sub-h);
+            background: var(--color-light-blue-trans);
+            transform-origin: top; 
+            transform: rotateX(180deg); 
+            transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(84, 153, 199, 0.3);
+        }
+
+        .is-open ~ .sub-deep-blue { transform: translateX(-50%) rotateX(90deg); }
+        .is-open ~ .sub-deep-blue .sub-light-blue { transform: rotateX(90deg); }
+
+    </style>
+</head>
+<body>
+
+    <div class="viewport" id="viewport">
+        <div class="card-system">
+            <div class="card-bottom"></div>
+            
+            <div class="card-top" id="cover">
+                <div class="face front"></div>
+                <div class="face back"></div>
+            </div>
+
+            <div class="sub-deep-blue">
+                <div class="main-img-attachment">
+                    <img src="IMG_6832.jpg" alt="主圖">
+                </div>
+                <div class="sub-light-blue"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const viewport = document.getElementById('viewport');
+        const cover = document.getElementById('cover');
+        let isDragging = false, startX, startY, rotX = 30, rotY = -30;
+        window.addEventListener('mousedown', (e) => { isDragging = true; startX = e.pageX; startY = e.pageY; });
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            rotY += (e.pageX - startX) * 0.5; rotX -= (e.pageY - startY) * 0.5;
+            viewport.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+            startX = e.pageX; startY = e.pageY;
+        });
+        window.addEventListener('mouseup', () => isDragging = false);
+        let clickStart;
+        viewport.addEventListener('mousedown', () => clickStart = Date.now());
+        viewport.addEventListener('mouseup', () => {
+            if (Date.now() - clickStart < 200) cover.classList.toggle('is-open');
+        });
+    </script>
+</body>
+</html>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pop-up Book：物理防穿透最終版</title>
