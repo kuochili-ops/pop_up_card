@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book：比例約束對齊版</title>
+    <title>Pop-up Book：主圖比例溢出版</title>
     <style>
         :root {
             --card-w: 350px;
             --card-h: 220px;
             --sub-w: 87.5px;
             --sub-h: 60px;
-            /* 主圖最大尺寸約束 (大卡的 1/3) */
-            --img-max-w: 116px; 
-            --img-max-h: 73px;
+            
+            /* 修正後的約束：大卡上頁的 1/3 */
+            --img-limit: 116px; /* 350 / 3 */
             
             --duration: 1.5s;
             --color-inner: #fdfcf0;
@@ -84,7 +84,7 @@
         .face.front { background-image: url('IMG_6829.png'); transform: rotateX(180deg); }
         .face.back { background-image: url('IMG_6831.png'); transform-style: preserve-3d; }
 
-        /* --- 核心結構：主圖比例約束與底部對齊 --- */
+        /* --- 核心結構：溢出小卡但受限於大卡 1/3 --- */
 
         .sub-deep-blue {
             position: absolute;
@@ -98,27 +98,34 @@
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
             border: 1px solid rgba(41, 128, 185, 0.5);
+            /* 允許圖片溢出小卡邊界 */
+            overflow: visible; 
         }
 
-        /* 主圖容器：限制在 1/3 大卡內 */
-        .main-img-wrapper {
+        .main-img-container {
             position: absolute;
             left: 50%;
             bottom: 0; /* 底部對齊小卡下頁邊緣 */
-            width: var(--img-max-w);
-            height: var(--img-max-h);
-            transform: translateX(-50%) rotateX(180deg); /* 翻轉到外側 */
+            /* 設定最大約束為大卡 1/3 */
+            width: var(--img-limit);
+            height: var(--img-limit);
+            
+            /* 翻轉到外側 */
+            transform: translateX(-50%) rotateX(180deg); 
             transform-style: preserve-3d;
             backface-visibility: visible;
+            
             display: flex;
-            align-items: flex-end; /* 確保內容靠底 */
+            align-items: flex-end; /* 靠底對齊 */
             justify-content: center;
+            pointer-events: none;
         }
 
-        .main-img-wrapper img {
+        .main-img-container img {
+            /* 確保圖片在 1/3 範圍內等比例縮放，且不被裁切 */
             max-width: 100%;
             max-height: 100%;
-            object-fit: contain; /* 等比例縮小 */
+            object-fit: contain; 
             display: block;
         }
 
@@ -153,7 +160,7 @@
             </div>
 
             <div class="sub-deep-blue">
-                <div class="main-img-wrapper">
+                <div class="main-img-container">
                     <img src="IMG_6832.jpg" alt="主圖">
                 </div>
                 <div class="sub-light-blue"></div>
