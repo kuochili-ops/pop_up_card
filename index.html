@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book：淺藍在上實體摺法</title>
+    <title>Pop-up Book：透明觀測版</title>
     <style>
         :root {
             --card-w: 350px;
@@ -12,9 +12,8 @@
             --sub-h: 60px;
             --duration: 1.5s;
             --color-inner: #fdfcf0;
-            --color-deep-blue: #3498db;
-            --color-light-blue: #85c1e9;
-            /* 軸 A (深藍頁與底座接合處) 的位置 */
+            --color-deep-blue: rgba(52, 152, 219, 0.9);  /* 深藍 */
+            --color-light-blue: rgba(133, 193, 233, 0.9); /* 淺藍 */
             --anchor-a-y: 60px; 
         }
 
@@ -54,6 +53,7 @@
             transform-style: preserve-3d;
         }
 
+        /* --- 大卡上頁：設為透明方便觀察 --- */
         .card-top {
             position: absolute;
             bottom: 0;
@@ -74,12 +74,13 @@
             width: 100%;
             height: 100%;
             backface-visibility: hidden;
-            border: 1px solid #ccc;
+            border: 2px dashed #e74c3c; /* 紅色虛線邊框方便辨識位置 */
         }
-        .face.front { background: #e74c3c; transform: rotateX(180deg); }
-        .face.back { background: var(--color-inner); transform-style: preserve-3d; }
+        /* 透明化處理 */
+        .face.front { background: rgba(231, 76, 60, 0.2); transform: rotateX(180deg); }
+        .face.back { background: rgba(253, 252, 240, 0.3); transform-style: preserve-3d; }
 
-        /* --- 修正的核心結構 --- */
+        /* --- 小卡結構：淺藍在上，深藍在下 --- */
 
         .sub-deep-blue {
             position: absolute;
@@ -88,8 +89,8 @@
             width: var(--sub-w);
             height: var(--sub-h);
             background: var(--color-deep-blue);
-            /* 軸 A：與大卡底座接合 */
             transform-origin: top; 
+            /* 初始平貼在底座上 */
             transform: translateX(-50%) rotateX(0deg);
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
@@ -98,34 +99,31 @@
 
         .sub-light-blue {
             position: absolute;
-            /* 軸 B (摺痕)：位於深藍頁的近鏡頭端 */
+            /* 摺痕在深藍頁的底邊（靠近鏡頭） */
             top: 100%; 
             left: 0;
             width: 100%;
             height: var(--sub-h);
             background: var(--color-light-blue);
             transform-origin: top; 
-            /* 初始狀態：翻折 -180 度，使其蓋在深藍頁的「上方」 */
-            /* 此時摺痕朝向鏡頭，淺藍頁覆蓋在深藍頁之上 */
-            transform: rotateX(-180deg); 
+            /* 初始狀態：反摺 180 度蓋在深藍頁上方 */
+            /* translateZ(1px) 確保它物理上在深藍頁「之上」 */
+            transform: rotateX(-180deg) translateZ(1px); 
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             border: 1px solid #5499c7;
             backface-visibility: visible;
-            /* 確保視覺上在上方 */
-            z-index: 5; 
         }
 
-        /* --- 連動邏輯：同步張開 --- */
+        /* --- 連動邏輯 --- */
 
-        /* 1. 深藍頁立起 (0 -> 90度)，摺痕邊往上移 */
+        /* 1. 深藍頁立起，摺痕邊向上升起 */
         .card-top.is-open ~ .sub-deep-blue {
             transform: translateX(-50%) rotateX(90deg);
         }
 
-        /* 2. 淺藍頁從小卡上方翻開 */
-        /* 從 -180 度(疊在上面) 轉動到 0 度(相對於深藍頁攤平) 或更多 */
+        /* 2. 淺藍頁從小卡上方翻開 180 度（從疊著變攤平） */
         .card-top.is-open ~ .sub-deep-blue .sub-light-blue {
-            transform: rotateX(0deg); 
+            transform: rotateX(0deg) translateZ(1px); 
         }
 
     </style>
