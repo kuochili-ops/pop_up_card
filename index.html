@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book：圖片再次上移版</title>
+    <title>Pop-up Book：圖片正確上移版</title>
     <style>
         :root {
             --card-w: 350px;
@@ -66,16 +66,17 @@
             overflow: visible; 
         }
 
-        /* --- 核心修正：圖片下緣再次上移 --- */
+        /* --- 核心修正：正確方向的上移 --- */
         .main-img-attachment {
             position: absolute; 
             left: 50%;
-            /* 關鍵：從小卡底邊再往上推 25px，確保閉合時絕不碰觸底頁 */
-            bottom: 25px; 
+            /* 將底部錨定在深藍頁的頂部摺痕處 */
+            bottom: 100%; 
             width: var(--img-w); 
             height: var(--img-h);
-            /* 維持面對鏡頭，translateZ 確保貼在深藍頁的前方 */
-            transform: translateX(-50%) rotateX(180deg) translateZ(2px);
+            /* 使用 translateY(85px) 將圖片向下推回深藍頁，但物理重心保持在上方 */
+            /* 這樣閉合時，圖片會在大卡中線上方平躺，不會穿透底頁 */
+            transform: translateX(-50%) translateY(85px) rotateX(180deg) translateZ(2px);
             pointer-events: none; 
             backface-visibility: visible;
         }
