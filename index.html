@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book：小卡底部對齊版</title>
+    <title>Pop-up Book：小卡原尺寸貼圖對齊版</title>
     <style>
         :root {
             --card-w: 350px;
@@ -89,7 +89,7 @@
             transform-style: preserve-3d;
         }
 
-        /* --- 修正：圖片下緣對齊 --- */
+        /* --- 核心結構：原尺寸與底部對齊 --- */
 
         .sub-deep-blue {
             position: absolute;
@@ -103,23 +103,31 @@
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
             border: 1px solid rgba(41, 128, 185, 0.5);
+            /* 讓溢出的原尺寸圖片可以顯示出來 */
+            overflow: visible; 
         }
 
-        /* 深藍頁外側貼圖 - 底部對齊 */
+        /* 深藍頁外側貼圖 - 原尺寸對齊下緣 */
         .sub-deep-blue::before {
             content: '';
             position: absolute;
-            width: 100%;
-            /* 如果圖片很大，可以讓高度溢出，或者設為 100% 並靠底 */
-            height: 100%; 
+            /* 強制讓虛擬容器足夠大，避免圖片被裁切 */
+            width: 2000px; 
+            height: 2000px;
+            /* 定位在中底部 */
+            left: 50%;
+            bottom: 0;
+            transform: translateX(-50%) rotateX(180deg);
+            
             background-image: url('IMG_6832.jpg');
-            /* 關鍵：圖片寬度填滿，高度自動，且對齊底部 */
-            background-size: contain; 
+            /* 關鍵：使用原尺寸 */
+            background-size: auto; 
             background-repeat: no-repeat;
-            background-position: bottom; 
-            /* 翻轉到背面（外側） */
-            transform: rotateX(180deg);
+            /* 關鍵：對齊背景圖片的中間與底部 */
+            background-position: center bottom; 
+            
             backface-visibility: visible;
+            pointer-events: none;
         }
 
         .sub-light-blue {
