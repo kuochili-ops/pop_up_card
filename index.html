@@ -3,18 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book：物理平貼對齊版</title>
+    <title>Pop-up Book：物理不穿透最終版</title>
     <style>
         :root {
             --card-w: 350px;
             --card-h: 220px;
             --sub-w: 87.5px;
             --sub-h: 60px;
-            
-            /* 大卡 1/3 的尺寸界限 */
-            --max-img-w: 116px;
-            --max-img-h: 73px;
-            
+            --img-limit-w: 116px; /* 大卡 1/3 */
+            --img-limit-h: 73px;
             --duration: 1.5s;
             --color-inner: #fdfcf0;
             --color-deep-blue-trans: rgba(52, 152, 219, 0.4);
@@ -81,12 +78,41 @@
             background-size: cover;
             background-position: center;
         }
-
         .face.front { background-image: url('IMG_6829.png'); transform: rotateX(180deg); }
         .face.back { background-image: url('IMG_6831.png'); transform-style: preserve-3d; }
 
-        /* --- 修正：圖片作為深藍頁的延伸貼皮 --- */
+        /* --- 主圖：獨立旋轉軸心，確保不穿透底頁 --- */
+        .main-stand-img {
+            position: absolute;
+            left: 50%;
+            /* 將軸心定在小卡下頁的底端 (摺痕位置) */
+            top: calc(var(--anchor-a-y) + var(--sub-h));
+            width: var(--img-limit-w);
+            height: var(--img-limit-h);
+            /* 以底部為旋轉中心 */
+            transform-origin: bottom;
+            /* 初始：翻折 180 度平貼在底頁（且不穿透） */
+            transform: translateX(-50%) rotateX(180deg);
+            transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+            pointer-events: none;
+        }
 
+        .main-stand-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: bottom;
+            /* 修正圖片方向，讓它立起來時是正的 */
+            transform: rotateX(180deg); 
+        }
+
+        /* 當卡片開啟時，主圖立起 90 度 */
+        .is-open ~ .main-stand-img {
+            transform: translateX(-50%) rotateX(90deg);
+        }
+
+        /* --- 小卡結構 --- */
         .sub-deep-blue {
             position: absolute;
             left: 50%;
@@ -99,32 +125,6 @@
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
             border: 1px solid rgba(41, 128, 185, 0.5);
-            /* 讓主圖可以向上溢出 */
-            overflow: visible; 
-        }
-
-        /* 主圖：作為深藍頁的背面貼層 */
-        .sub-deep-blue::before {
-            content: '';
-            position: absolute;
-            /* 圖片寬度與高度受限於大卡 1/3，但底部與小卡對齊 */
-            width: var(--max-img-w);
-            height: var(--max-img-h);
-            
-            /* 定位在小卡下緣，水平居中 */
-            left: 50%;
-            bottom: 0;
-            
-            /* 關鍵：translateZ(0.5px) 讓它貼在深藍頁外側，rotateX(180deg) 翻向外 */
-            transform: translateX(-50%) rotateX(180deg) translateZ(0.5px);
-            
-            background-image: url('IMG_6832.jpg');
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: bottom center;
-            
-            backface-visibility: visible;
-            pointer-events: none;
         }
 
         .sub-light-blue {
@@ -157,6 +157,10 @@
                 <div class="face back"></div>
             </div>
 
+            <div class="main-stand-img">
+                <img src="IMG_6832.jpg" alt="主圖">
+            </div>
+
             <div class="sub-deep-blue">
                 <div class="sub-light-blue"></div>
             </div>
@@ -167,17 +171,14 @@
         const viewport = document.getElementById('viewport');
         const cover = document.getElementById('cover');
         let isDragging = false, startX, startY, rotX = 30, rotY = -30;
-
         window.addEventListener('mousedown', (e) => { isDragging = true; startX = e.pageX; startY = e.pageY; });
         window.addEventListener('mousemove', (e) => {
             if (!isDragging) return;
-            rotY += (e.pageX - startX) * 0.5;
-            rotX -= (e.pageY - startY) * 0.5;
+            rotY += (e.pageX - startX) * 0.5; rotX -= (e.pageY - startY) * 0.5;
             viewport.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
             startX = e.pageX; startY = e.pageY;
         });
         window.addEventListener('mouseup', () => isDragging = false);
-
         let clickStart;
         viewport.addEventListener('mousedown', () => clickStart = Date.now());
         viewport.addEventListener('mouseup', () => {
