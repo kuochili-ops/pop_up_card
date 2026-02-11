@@ -3,17 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book：圖片上下邊緣校正版</title>
+    <title>Pop-up Book：粉紅紙質放大版</title>
     <style>
         :root {
             --card-w: 350px;
             --card-h: 220px;
             --sub-w: 87.5px;
             --sub-h: 60px;
-            --img-limit-w: 116px; 
-            --img-limit-h: 73px;
+            /* 放大主圖：調整為接近大卡寬度的一半 */
+            --img-limit-w: 160px; 
+            --img-limit-h: 110px;
+            
             --duration: 1.5s;
-            --color-inner: #fdfcf0;
+            --color-inner: #fdfcf0; /* 上頁內側色 */
+            --color-pink-paper: #ffe4e1; /* 淺粉紅紙質色 (MistyRose) */
             --color-deep-blue-trans: rgba(52, 152, 219, 0.4);
             --color-light-blue-trans: rgba(133, 193, 233, 0.4);
             --anchor-a-y: 60px; 
@@ -46,13 +49,15 @@
             transform-style: preserve-3d;
         }
 
+        /* 大卡下頁：改為淺粉紅紙質 */
         .card-bottom {
             position: absolute;
             width: 100%;
             height: 100%;
-            background: var(--color-inner);
-            border: 1px solid #ccc;
+            background: var(--color-pink-paper);
+            border: 1px solid #f5c6cb;
             transform-style: preserve-3d;
+            box-shadow: inset 0 0 50px rgba(255,255,255,0.5), 0 10px 30px rgba(0,0,0,0.3);
         }
 
         .card-top {
@@ -81,16 +86,14 @@
         .face.front { background-image: url('IMG_6829.png'); transform: rotateX(180deg); }
         .face.back { background-image: url('IMG_6831.png'); transform-style: preserve-3d; }
 
-        /* --- 主圖修正：確保圖片真正的「下緣」貼在摺痕上 --- */
+        /* --- 主圖：放大且底部對齊 --- */
         .main-stand-img {
             position: absolute;
             left: 50%;
-            /* 軸心在大卡中心線上 */
             top: 0px; 
             width: var(--img-limit-w);
             height: var(--img-limit-h);
             transform-origin: bottom;
-            /* 初始狀態：平躺在底面。注意：移除內部的 rotate，改由容器決定方向 */
             transform: translateX(-50%) rotateX(180deg);
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
@@ -101,18 +104,15 @@
             width: 100%;
             height: 100%;
             object-fit: contain;
-            /* 重要：現在圖片正常呈現，其真正的下緣會貼在大卡摺痕上 */
-            object-position: bottom;
-            /* 移除原本錯誤的 rotateX(180deg) */
+            object-position: bottom; /* 確保圖片真正的下緣貼齊 */
             transform: none; 
         }
 
-        /* 開啟時：立起至垂直位置 */
         .is-open ~ .main-stand-img {
-            transform: translateX(-50%) rotateX(270deg); /* 轉到垂直角度 */
+            transform: translateX(-50%) rotateX(270deg);
         }
 
-        /* --- 小卡結構維持 --- */
+        /* --- 小卡結構維持透明感 --- */
         .sub-deep-blue {
             position: absolute;
             left: 50%;
@@ -124,7 +124,7 @@
             transform: translateX(-50%) rotateX(0deg);
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
-            border: 1px solid rgba(41, 128, 185, 0.5);
+            border: 1px solid rgba(41, 128, 185, 0.3);
         }
 
         .sub-light-blue {
@@ -137,7 +137,7 @@
             transform-origin: top; 
             transform: rotateX(180deg) translateZ(2px); 
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid rgba(84, 153, 199, 0.5);
+            border: 1px solid rgba(84, 153, 199, 0.3);
             backface-visibility: visible;
         }
 
