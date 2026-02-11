@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book：實體閉合摺疊修正</title>
+    <title>Pop-up Book：淺藍在上實體摺法</title>
     <style>
         :root {
             --card-w: 350px;
@@ -14,7 +14,7 @@
             --color-inner: #fdfcf0;
             --color-deep-blue: #3498db;
             --color-light-blue: #85c1e9;
-            /* 軸 A 固定在底座的位置，稍微往後移讓摺痕有空間朝向鏡頭 */
+            /* 軸 A (深藍頁與底座接合處) 的位置 */
             --anchor-a-y: 60px; 
         }
 
@@ -32,7 +32,6 @@
             width: var(--card-w);
             height: var(--card-h);
             transform-style: preserve-3d;
-            /* 視角稍微壓低，更能看清摺痕朝向鏡頭的動態 */
             transform: rotateX(35deg) rotateY(-15deg);
         }
 
@@ -80,7 +79,7 @@
         .face.front { background: #e74c3c; transform: rotateX(180deg); }
         .face.back { background: var(--color-inner); transform-style: preserve-3d; }
 
-        /* --- 修正：閉合狀態，摺痕朝鏡頭 --- */
+        /* --- 修正的核心結構 --- */
 
         .sub-deep-blue {
             position: absolute;
@@ -89,7 +88,7 @@
             width: var(--sub-w);
             height: var(--sub-h);
             background: var(--color-deep-blue);
-            /* 軸 A：固定在底座的遠端邊緣 */
+            /* 軸 A：與大卡底座接合 */
             transform-origin: top; 
             transform: translateX(-50%) rotateX(0deg);
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
@@ -105,26 +104,26 @@
             width: 100%;
             height: var(--sub-h);
             background: var(--color-light-blue);
-            /* 轉軸在摺痕邊 */
             transform-origin: top; 
-            /* 【關鍵修正】初始翻折 -180 度，讓它「摺回來」蓋在深藍頁之上 */
-            /* 這樣摺痕就在最前端正對鏡頭，小卡呈現閉合狀態 */
+            /* 初始狀態：翻折 -180 度，使其蓋在深藍頁的「上方」 */
+            /* 此時摺痕朝向鏡頭，淺藍頁覆蓋在深藍頁之上 */
             transform: rotateX(-180deg); 
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             border: 1px solid #5499c7;
             backface-visibility: visible;
+            /* 確保視覺上在上方 */
+            z-index: 5; 
         }
 
-        /* --- 同步連動邏輯 --- */
+        /* --- 連動邏輯：同步張開 --- */
 
-        /* 1. 深藍頁繞軸 A 立起，摺痕邊向上、向後移動 */
+        /* 1. 深藍頁立起 (0 -> 90度)，摺痕邊往上移 */
         .card-top.is-open ~ .sub-deep-blue {
             transform: translateX(-50%) rotateX(90deg);
         }
 
-        /* 2. 淺藍頁繞軸 B (摺痕) 同步張開 */
-        /* 從初始的 -180 度(重疊) 轉動到與深藍頁成 90 度(階梯狀) 或更大角度 */
-        /* 若要像你之前提到的 360 度效果，這裡可以設為 180deg (相對於初始點轉了 360) */
+        /* 2. 淺藍頁從小卡上方翻開 */
+        /* 從 -180 度(疊在上面) 轉動到 0 度(相對於深藍頁攤平) 或更多 */
         .card-top.is-open ~ .sub-deep-blue .sub-light-blue {
             transform: rotateX(0deg); 
         }
