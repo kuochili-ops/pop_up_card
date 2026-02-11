@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book：3D 視角自由旋轉版</title>
+    <title>Pop-up Book：實體貼圖版</title>
     <style>
         :root {
             --card-w: 350px;
@@ -12,8 +12,8 @@
             --sub-h: 60px;
             --duration: 1.5s;
             --color-inner: #fdfcf0;
-            --color-deep-blue: rgba(52, 152, 219, 0.9);
-            --color-light-blue: rgba(133, 193, 233, 1);
+            --color-deep-blue: #3498db;
+            --color-light-blue: #85c1e9;
             --anchor-a-y: 60px; 
         }
 
@@ -22,19 +22,18 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #1a1a1a; /* 深色背景更顯立體 */
+            background-color: #1a1a1a;
             margin: 0;
             perspective: 2500px;
             overflow: hidden;
             user-select: none;
         }
 
-        /* 視角旋轉容器 */
         .viewport {
             width: var(--card-w);
             height: var(--card-h);
             transform-style: preserve-3d;
-            transform: rotateX(30deg) rotateY(-30deg); /* 初始視角 */
+            transform: rotateX(30deg) rotateY(-30deg);
             cursor: grab;
         }
 
@@ -47,7 +46,6 @@
             transform-style: preserve-3d;
         }
 
-        /* 大卡元件 */
         .card-bottom {
             position: absolute;
             width: 100%;
@@ -55,8 +53,10 @@
             background: var(--color-inner);
             border: 1px solid #ccc;
             transform-style: preserve-3d;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
+        /* 大卡上頁：恢復正常質感與貼圖 */
         .card-top {
             position: absolute;
             bottom: 0;
@@ -77,12 +77,25 @@
             width: 100%;
             height: 100%;
             backface-visibility: hidden;
-            border: 1px solid rgba(255,255,255,0.2);
+            background-size: cover;
+            background-position: center;
         }
-        .face.front { background: rgba(231, 76, 60, 0.2); transform: rotateX(180deg); }
-        .face.back { background: rgba(253, 252, 240, 0.4); transform-style: preserve-3d; }
 
-        /* 小卡階梯連動 (Perfect 物理結構) */
+        /* 外側貼圖 IMG_6829.png */
+        .face.front { 
+            background-image: url('IMG_6829.png');
+            background-color: #e74c3c; /* 備用色 */
+            transform: rotateX(180deg); 
+        }
+
+        /* 內側貼圖 IMG_6831.png */
+        .face.back { 
+            background-image: url('IMG_6831.png');
+            background-color: var(--color-inner); /* 備用色 */
+            transform-style: preserve-3d;
+        }
+
+        /* 小卡 Perfect 物理結構 */
         .sub-deep-blue {
             position: absolute;
             left: 50%;
@@ -111,11 +124,9 @@
             backface-visibility: visible;
         }
 
-        /* 啟動狀態 */
         .is-open ~ .sub-deep-blue { transform: translateX(-50%) rotateX(90deg); }
         .is-open ~ .sub-deep-blue .sub-light-blue { transform: rotateX(90deg) translateZ(2px); }
 
-        /* UI 指示器 */
         .instruction {
             position: absolute;
             bottom: 20px;
@@ -129,10 +140,10 @@
 </head>
 <body>
 
-    <div class="instruction">滑鼠拖曳旋轉視角 | 點擊卡片開合</div>
+    <div class="instruction">拖曳旋轉 | 點擊開合</div>
 
     <div class="viewport" id="viewport">
-        <div class="card-system" id="card">
+        <div class="card-system">
             <div class="card-bottom"></div>
             
             <div class="card-top" id="cover">
@@ -153,7 +164,6 @@
         let startX, startY;
         let rotX = 30, rotY = -30;
 
-        // 處理旋轉
         window.addEventListener('mousedown', (e) => {
             isDragging = true;
             startX = e.pageX;
@@ -162,21 +172,15 @@
 
         window.addEventListener('mousemove', (e) => {
             if (!isDragging) return;
-            let dx = e.pageX - startX;
-            let dy = e.pageY - startY;
-            
-            rotY += dx * 0.5;
-            rotX -= dy * 0.5;
-            
+            rotY += (e.pageX - startX) * 0.5;
+            rotX -= (e.pageY - startY) * 0.5;
             viewport.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
-            
             startX = e.pageX;
             startY = e.pageY;
         });
 
         window.addEventListener('mouseup', () => isDragging = false);
 
-        // 處理點擊開合 (避免拖曳時觸發)
         let clickStart;
         viewport.addEventListener('mousedown', () => clickStart = Date.now());
         viewport.addEventListener('mouseup', () => {
