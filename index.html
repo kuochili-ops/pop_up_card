@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book：使用者觀點向下微調版</title>
+    <title>Pop-up Book：使用者觀點再次下調版</title>
     <style>
         :root {
             --card-w: 350px;
@@ -65,17 +65,15 @@
             overflow: visible; 
         }
 
-        /* --- 修正後的圖片邏輯：依照您的觀點往下一點 --- */
+        /* --- 再次下調：將 translateY 縮小到 5px --- */
         .main-img-attachment {
             position: absolute; 
             left: 50%;
-            top: 0; /* 基準線在深藍頁與大卡下頁的接合處 */
+            top: 0; 
             width: var(--img-w); 
             height: var(--img-h);
-            
-            /* 將 40px 改為 20px，圖片視覺上會往「下」靠近接合處 */
-            transform: translateX(-50%) translateY(20px) rotateX(180deg) translateZ(2px);
-            
+            /* 從 20px 降至 5px，圖片視覺上會更靠近接合處 */
+            transform: translateX(-50%) translateY(5px) rotateX(180deg) translateZ(2px);
             pointer-events: none; 
             backface-visibility: visible;
         }
