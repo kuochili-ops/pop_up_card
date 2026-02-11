@@ -3,16 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book：主圖回歸大卡內版</title>
+    <title>Pop-up Book：主圖對齊小卡下頁版</title>
     <style>
         :root {
             --card-w: 350px;
             --card-h: 220px;
             --sub-w: 87.5px;
             --sub-h: 60px;
-            /* 調整主圖尺寸，確保在大卡內 */
             --img-limit-w: 140px; 
-            --img-limit-h: 90px;
+            --img-limit-h: 95px;
             --duration: 1.5s;
             --color-inner: #fdfcf0;
             --color-pink-paper: #ffe4e1;
@@ -83,7 +82,7 @@
         .face.front { background-image: url('IMG_6829.png'); transform: rotateX(180deg); }
         .face.back { background-image: url('IMG_6831.png'); transform-style: preserve-3d; }
 
-        /* --- 小卡結構：將圖片嵌入此處以確保位置 --- */
+        /* 小卡下頁 (深藍透明頁) */
         .sub-deep-blue {
             position: absolute;
             left: 50%;
@@ -96,29 +95,29 @@
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
             border: 1px solid rgba(41, 128, 185, 0.3);
-            /* 讓溢出的主圖可以顯示 */
             overflow: visible; 
         }
 
-        /* 主圖：作為深藍頁的子元素，並推移至前方 */
+        /* --- 主圖修正：貼齊小卡下頁的下緣 --- */
         .main-img-stand {
             position: absolute;
             left: 50%;
-            /* 底部對齊小卡下頁的底邊 */
-            bottom: 0;
+            /* 關鍵：top: 100% 確保圖片底邊對齊小卡下頁的底邊 */
+            top: 100%;
             width: var(--img-limit-w);
             height: var(--img-limit-h);
-            /* 翻轉並推離平面 (translateZ) 避免重疊 */
-            transform: translateX(-50%) rotateX(180deg) translateZ(1px);
-            transform-origin: bottom;
+            /* 軸心設在圖片頂部（剛好是與下頁連接處） */
+            transform-origin: top;
+            /* 轉向正面並推前 1px */
+            transform: translateX(-50%) rotateX(-90deg) translateZ(1px);
             transform-style: preserve-3d;
-            backface-visibility: visible;
         }
 
         .main-img-stand img {
             width: 100%;
             height: 100%;
             object-fit: contain;
+            /* 圖片內容在容器內向下靠攏 */
             object-position: bottom;
         }
 
@@ -130,15 +129,13 @@
             height: var(--sub-h);
             background: var(--color-light-blue-trans);
             transform-origin: top; 
-            transform: rotateX(180deg) translateZ(2px); 
+            transform: rotateX(180deg); 
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             border: 1px solid rgba(84, 153, 199, 0.3);
-            backface-visibility: visible;
         }
 
-        /* 連動效果 */
         .is-open ~ .sub-deep-blue { transform: translateX(-50%) rotateX(90deg); }
-        .is-open ~ .sub-deep-blue .sub-light-blue { transform: rotateX(90deg) translateZ(2px); }
+        .is-open ~ .sub-deep-blue .sub-light-blue { transform: rotateX(90deg); }
 
     </style>
 </head>
