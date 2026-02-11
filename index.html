@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pop-up Book：主圖貼合小卡版</title>
+    <title>Pop-up Book：主圖回歸大卡內版</title>
     <style>
         :root {
             --card-w: 350px;
             --card-h: 220px;
             --sub-w: 87.5px;
             --sub-h: 60px;
-            --img-limit-w: 160px; 
-            --img-limit-h: 110px;
+            /* 調整主圖尺寸，確保在大卡內 */
+            --img-limit-w: 140px; 
+            --img-limit-h: 90px;
             --duration: 1.5s;
             --color-inner: #fdfcf0;
             --color-pink-paper: #ffe4e1;
@@ -82,36 +83,7 @@
         .face.front { background-image: url('IMG_6829.png'); transform: rotateX(180deg); }
         .face.back { background-image: url('IMG_6831.png'); transform-style: preserve-3d; }
 
-        /* --- 核心修正：將主圖貼靠在小卡下頁 --- */
-        .main-stand-img {
-            position: absolute;
-            left: 50%;
-            /* 修正位置：將圖片底部對齊小卡下頁的底邊（即距離中線 60px + 60px 的位置） */
-            top: calc(var(--anchor-a-y) + var(--sub-h)); 
-            width: var(--img-limit-w);
-            height: var(--img-limit-h);
-            transform-origin: bottom;
-            /* 初始：翻折 180 度，平貼在小卡位置的底面上 */
-            transform: translateX(-50%) rotateX(180deg);
-            transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
-            transform-style: preserve-3d;
-            pointer-events: none;
-        }
-
-        .main-stand-img img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            object-position: bottom;
-            transform: none; 
-        }
-
-        /* 開啟時：跟隨小卡立起，轉到垂直方向 */
-        .is-open ~ .main-stand-img {
-            transform: translateX(-50%) rotateX(270deg);
-        }
-
-        /* --- 小卡結構維持 --- */
+        /* --- 小卡結構：將圖片嵌入此處以確保位置 --- */
         .sub-deep-blue {
             position: absolute;
             left: 50%;
@@ -124,6 +96,30 @@
             transition: transform var(--duration) cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
             border: 1px solid rgba(41, 128, 185, 0.3);
+            /* 讓溢出的主圖可以顯示 */
+            overflow: visible; 
+        }
+
+        /* 主圖：作為深藍頁的子元素，並推移至前方 */
+        .main-img-stand {
+            position: absolute;
+            left: 50%;
+            /* 底部對齊小卡下頁的底邊 */
+            bottom: 0;
+            width: var(--img-limit-w);
+            height: var(--img-limit-h);
+            /* 翻轉並推離平面 (translateZ) 避免重疊 */
+            transform: translateX(-50%) rotateX(180deg) translateZ(1px);
+            transform-origin: bottom;
+            transform-style: preserve-3d;
+            backface-visibility: visible;
+        }
+
+        .main-img-stand img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: bottom;
         }
 
         .sub-light-blue {
@@ -140,6 +136,7 @@
             backface-visibility: visible;
         }
 
+        /* 連動效果 */
         .is-open ~ .sub-deep-blue { transform: translateX(-50%) rotateX(90deg); }
         .is-open ~ .sub-deep-blue .sub-light-blue { transform: rotateX(90deg) translateZ(2px); }
 
@@ -156,11 +153,10 @@
                 <div class="face back"></div>
             </div>
 
-            <div class="main-stand-img">
-                <img src="IMG_6832.jpg" alt="主圖">
-            </div>
-
             <div class="sub-deep-blue">
+                <div class="main-img-stand">
+                    <img src="IMG_6832.jpg" alt="主圖">
+                </div>
                 <div class="sub-light-blue"></div>
             </div>
         </div>
